@@ -345,30 +345,6 @@ def admin_panel():
 
     return "Admin Panel Working"
 
-@app.route("/promote-admin/<email>")
-def promote_admin(email):
-    if "user_id" not in session:
-        return "Login required"
-
-    conn = get_db_connection()
-    cur = conn.cursor()
-
-    try:
-        cur.execute(
-            "UPDATE users SET role='admin' WHERE email=%s",
-            (email,)
-        )
-        conn.commit()
-    except Exception as e:
-        conn.rollback()
-        return f"Error: {e}"
-    finally:
-        cur.close()
-        conn.close()
-
-    return f"{email} promoted to admin."
-
-
 
 @app.route("/logout")
 def logout():
