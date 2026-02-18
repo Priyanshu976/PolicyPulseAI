@@ -384,16 +384,55 @@ import google.generativeai as genai
 
 genai.configure(api_key=os.getenv("GOOGLE_API_KEY"))
 
-@app.route("/test-scheme-ai")
-def test_scheme_ai():
-    try:
-        model = genai.GenerativeModel("gemini-1.5-flash")
-        response = model.generate_content(
-            "List 3 government schemes in India for students."
-        )
-        return response.text
-    except Exception as e:
-        return f"Error: {e}"
+@app.route("/scheme-advisor", methods=["GET", "POST"])
+def scheme_advisor():
+    if "user_id" not in session:
+        return redirect("/login")
+
+    if request.method == "POST":
+        age = request.form["age"]
+        gender = request.form["gender"]
+        income = request.form["income"]
+        occupation = request.form["occupation"]
+        state = request.form["state"]
+        area_type = request.form["area_type"]
+        need = request.form["need"]
+
+        try:
+            model = genai.GenerativeModel("gemini-2.5-flash")
+
+            prompt = f"""
+            You are an AI Government Scheme Advisor for Indian citizens.
+
+            User Profile:
+            Age: {age}
+            Gender: {gender}
+            Monthly Income: {income}
+            Occupation: {occupation}
+            State: {state}
+            Area Type: {area_type}
+            Need: {need}
+
+            Provide:
+            1. 3-5 relevant government schemes
+            2. Key benefits
+            3. Eligibility criteria
+            4. How to apply
+            5. Official website link (if possible)
+
+            Keep explanation simple and structured.
+            """
+
+            response = model.generate_content(prompt)
+            advice = response.text
+
+            return render_template("scheme_result.html", advice=advice)
+
+        except Exception as e:
+            return f"Error: {e}"
+
+    return render_template("scheme_form.html")
+
 
 
 @app.route("/logout")
