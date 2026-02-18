@@ -352,7 +352,7 @@ def promote_admin():
 
     cur.execute(
         "UPDATE users SET role='admin' WHERE email=%s",
-        ("pbmgajghate@gmail.com",)
+        ("abc@gmail.com",)
     )
 
     conn.commit()
