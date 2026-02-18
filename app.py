@@ -392,6 +392,13 @@ def upload_policy():
 #     conn.close()
 
 #     return "Admin promoted successfully."
+@app.route("/admin")
+def admin_dashboard():
+    if "user_id" not in session or session.get("role") != "admin":
+        return "Access Denied"
+
+    return "Admin Panel Working"
+
 
 
 @app.route("/logout")
