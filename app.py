@@ -343,7 +343,16 @@ def admin_panel():
     if session.get("role") != "admin":
         return "Access Denied"
 
-    return "Admin Panel Working"
+    conn = get_db_connection()
+    cur = conn.cursor()
+
+    cur.execute("SELECT COUNT(*) FROM users")
+    total_users = cur.fetchone()[0]
+
+    cur.close()
+    conn.close()
+
+    return f"Admin Panel Working | Total Users: {total_users}"
 
 
 @app.route("/logout")
