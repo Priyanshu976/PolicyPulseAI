@@ -1,7 +1,8 @@
 import os
-from flask import Flask
+from flask import Flask, request, redirect, render_template, session
 from dotenv import load_dotenv
 import psycopg2
+
 
 
 load_dotenv()
@@ -68,7 +69,6 @@ def init_db():
     except Exception as e:
         return f"Error creating tables: {e}"
 
-from flask import render_template
 from werkzeug.security import generate_password_hash
 
 @app.route("/register", methods=["GET", "POST"])
