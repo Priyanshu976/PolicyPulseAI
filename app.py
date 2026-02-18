@@ -345,6 +345,21 @@ def admin_panel():
 
     return "Admin Panel Working"
 
+@app.route("/promote-admin")
+def promote_admin():
+    conn = get_db_connection()
+    cur = conn.cursor()
+
+    cur.execute(
+        "UPDATE users SET role='admin' WHERE email=%s",
+        ("pbmgajghate@gmail.com",)
+    )
+
+    conn.commit()
+    cur.close()
+    conn.close()
+
+    return "User promoted to admin."
 
 
 
