@@ -18,37 +18,18 @@ def get_db_connection():
 def home():
     return "Policy Pulse AI Clean Version Running!"
 
-@app.route("/init-db")
-def init_db():
-    conn = get_db_connection()
-    cur = conn.cursor()
-
-    cur.execute("""
-        CREATE TABLE IF NOT EXISTS users (
-            id SERIAL PRIMARY KEY,
-            name VARCHAR(100),
-            email VARCHAR(120) UNIQUE NOT NULL,
-            password VARCHAR(200) NOT NULL,
-            role VARCHAR(20) DEFAULT 'user'
-        );
-    """)
-
-    cur.execute("""
-        CREATE TABLE IF NOT EXISTS policies (
-            id SERIAL PRIMARY KEY,
-            user_id INTEGER REFERENCES users(id),
-            title VARCHAR(200),
-            summary TEXT,
-            sentiment VARCHAR(20),
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-        );
-    """)
-
-    conn.commit()
-    cur.close()
-    conn.close()
-
-    return "Database initialized successfully!"
+@app.route("/test-db")
+def test_db():
+    try:
+        conn = get_db_connection()
+        cur = conn.cursor()
+        cur.execute("SELECT 1;")
+        result = cur.fetchone()
+        cur.close()
+        conn.close()
+        return f"Database connected successfully! Result: {result}"
+    except Exception as e:
+        return f"Database connection failed: {e}"
 
 
 if __name__ == "__main__":
