@@ -348,11 +348,19 @@ def admin_panel():
 
     cur.execute("SELECT COUNT(*) FROM users")
     total_users = cur.fetchone()[0]
+    cur.execute("SELECT COUNT(*) FROM policies")
+    total_policies = cur.fetchone()[0]
+
 
     cur.close()
     conn.close()
 
-    return f"Admin Panel Working | Total Users: {total_users}"
+    return f"""
+    Admin Panel Working <br>
+    Total Users: {total_users} <br>
+    Total Policies: {total_policies}
+    """
+
 
 
 @app.route("/logout")
