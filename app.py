@@ -2,6 +2,10 @@ import os
 from flask import Flask, request, redirect, render_template, session
 from dotenv import load_dotenv
 import psycopg2
+import PyPDF2
+import re
+from collections import Counter
+
 
 
 
@@ -15,6 +19,46 @@ DATABASE_URL = os.getenv("DATABASE_URL")
 def get_db_connection():
     conn = psycopg2.connect(DATABASE_URL)
     return conn
+
+def extract_text_from_pdf(file):
+    reader = PyPDF2.PdfReader(file)
+    text = ""
+
+    for page in reader.pages:
+        text += page.extract_text() or ""
+
+    return text
+
+def generate_summary(text, num_sentences=5):
+    # Clean text
+    text = re.sub(r'\s+', ' ', text)
+
+    # Split into sentences
+    sentences = re.split(r'(?<=[.!?]) +', text)
+
+    if len(sentences) <= num_sentences:
+        return text
+
+    # Word frequency
+    words = re.findall(r'\w+', text.lower())
+    word_freq = Counter(words)
+
+    sentence_scores = {}
+
+    for sentence in sentences:
+        for word in re.findall(r'\w+', sentence.lower()):
+            if word in word_freq:
+                sentence_scores[sentence] = sentence_scores.get(sentence, 0) + word_freq[word]
+
+    # Sort sentences by score
+    ranked_sentences = sorted(sentence_scores, key=sentence_scores.get, reverse=True)
+
+    summary_sentences = ranked_sentences[:num_sentences]
+
+    summary = " ".join(summary_sentences)
+
+    return summary
+
 
 @app.route("/")
 def home():
@@ -171,6 +215,42 @@ def add_policy():
         return redirect("/dashboard")
 
     return render_template("add_policy.html")
+
+@app.route("/upload-policy", methods=["GET", "POST"])
+def upload_policy():
+    if "user_id" not in session:
+        return redirect("/login")
+
+    if request.method == "POST":
+        title = request.form["title"]
+        pdf_file = request.files["pdf"]
+
+        if pdf_file.filename == "":
+            return "No file selected."
+
+        try:
+            text = extract_text_from_pdf(pdf_file)
+            summary = generate_summary(text)
+
+            conn = get_db_connection()
+            cur = conn.cursor()
+
+            cur.execute(
+                "INSERT INTO policies (user_id, title, summary, sentiment) VALUES (%s, %s, %s, %s)",
+                (session["user_id"], title, summary, "neutral")
+            )
+
+            conn.commit()
+            cur.close()
+            conn.close()
+
+            return f"<h3>Summary:</h3><p>{summary}</p><br><a href='/dashboard'>Back to Dashboard</a>"
+
+        except Exception as e:
+            return f"Error processing PDF: {e}"
+
+    return render_template("upload_policy.html")
+
 
 @app.route("/logout")
 def logout():
