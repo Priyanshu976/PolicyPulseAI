@@ -68,33 +68,36 @@ def init_db():
     except Exception as e:
         return f"Error creating tables: {e}"
 
-
-
+from flask import render_template
 from werkzeug.security import generate_password_hash
 
-@app.route("/test-register")
-def test_register():
-    try:
+@app.route("/register", methods=["GET", "POST"])
+def register():
+    if request.method == "POST":
+        name = request.form["name"]
+        email = request.form["email"]
+        password = generate_password_hash(request.form["password"])
+
         conn = get_db_connection()
         cur = conn.cursor()
 
-        hashed_password = generate_password_hash("test123")
+        try:
+            cur.execute(
+                "INSERT INTO users (name, email, password) VALUES (%s, %s, %s)",
+                (name, email, password)
+            )
+            conn.commit()
+        except Exception as e:
+            conn.rollback()
+            return f"Error: {e}"
 
-        cur.execute(
-            "INSERT INTO users (name, email, password) VALUES (%s, %s, %s) RETURNING id;",
-            ("Test User", "test@example.com", hashed_password)
-        )
-
-        user_id = cur.fetchone()[0]
-
-        conn.commit()
         cur.close()
         conn.close()
 
-        return f"Test user created with ID: {user_id}"
+        return "User registered successfully!"
 
-    except Exception as e:
-        return f"Error inserting user: {e}"
+    return render_template("register.html")
+
 
 
 
