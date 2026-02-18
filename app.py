@@ -98,6 +98,33 @@ def register():
 
     return render_template("register.html")
 
+from werkzeug.security import check_password_hash
+
+@app.route("/login", methods=["GET", "POST"])
+def login():
+    if request.method == "POST":
+        email = request.form["email"]
+        password = request.form["password"]
+
+        conn = get_db_connection()
+        cur = conn.cursor()
+
+        cur.execute(
+            "SELECT id, password FROM users WHERE email=%s",
+            (email,)
+        )
+        user = cur.fetchone()
+
+        cur.close()
+        conn.close()
+
+        if user and check_password_hash(user[1], password):
+            session["user_id"] = user[0]
+            return "Login successful!"
+
+        return "Invalid credentials."
+
+    return render_template("login.html")
 
 
 
