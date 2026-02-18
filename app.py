@@ -358,6 +358,15 @@ def admin_panel():
             formatted = sentiment.capitalize()
             if formatted in sentiment_counts:
                 sentiment_counts[formatted] = count
+    cur.execute("SELECT keywords FROM policies WHERE keywords IS NOT NULL")
+    keyword_rows = cur.fetchall()
+    all_keywords = []
+    for row in keyword_rows:
+        if row[0]:
+            all_keywords.extend(row[0].split(", "))
+    keyword_freq = Counter(all_keywords)
+    top_keywords = keyword_freq.most_common(5)
+
 
     cur.close()
     conn.close()
@@ -370,9 +379,11 @@ def admin_panel():
     Sentiment Distribution:<br>
     Positive: {sentiment_counts['Positive']} <br>
     Negative: {sentiment_counts['Negative']} <br>
-    Neutral: {sentiment_counts['Neutral']}
-    """
+    Neutral: {sentiment_counts['Neutral']} <br><br>
 
+    Top Keywords:<br>
+    {top_keywords}
+    """
 
 
 
