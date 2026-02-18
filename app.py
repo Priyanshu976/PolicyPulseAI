@@ -254,7 +254,6 @@ def dashboard():
     keyword_freq = Counter(all_keywords)
     top_keywords = keyword_freq.most_common(5)
 
-
     cur.close()
     conn.close()
 
