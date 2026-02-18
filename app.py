@@ -18,6 +18,7 @@ load_dotenv()
 
 app = Flask(__name__)
 app.secret_key = "super_secret_key"
+print("DATABASE_URL:", DATABASE_URL)
 
 DATABASE_URL = os.getenv("DATABASE_URL")
 
@@ -392,12 +393,14 @@ def upload_policy():
 #     conn.close()
 
 #     return "Admin promoted successfully."
-@app.route("/admin")
-def admin_dashboard():
-    if "user_id" not in session or session.get("role") != "admin":
-        return "Access Denied"
 
-    return "Admin Panel Working"
+
+# @app.route("/admin")
+# def admin_dashboard():
+#     if "user_id" not in session or session.get("role") != "admin":
+#         return "Access Denied"
+
+#     return "Admin Panel Working"
 
 
 
