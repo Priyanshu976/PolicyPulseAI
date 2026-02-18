@@ -2,8 +2,22 @@
 <html>
 <body>
     <h2>Dashboard</h2>
-    <p>Welcome to Policy Pulse AI!</p>
 
+    <a href="/add-policy">Add New Policy</a>
     <a href="/logout">Logout</a>
+
+    <h3>Your Policies</h3>
+
+    {% for policy in policies %}
+        <div>
+            <h4>{{ policy[0] }}</h4>
+            <p>{{ policy[1] }}</p>
+            <small>{{ policy[2] }}</small>
+            <hr>
+        </div>
+    {% else %}
+        <p>No policies yet.</p>
+    {% endfor %}
+
 </body>
 </html>

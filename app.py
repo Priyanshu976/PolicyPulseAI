@@ -131,7 +131,46 @@ def dashboard():
     if "user_id" not in session:
         return redirect("/login")
 
-    return render_template("dashboard.html")
+    conn = get_db_connection()
+    cur = conn.cursor()
+
+    cur.execute(
+        "SELECT title, summary, created_at FROM policies WHERE user_id=%s ORDER BY created_at DESC",
+        (session["user_id"],)
+    )
+
+    policies = cur.fetchall()
+
+    cur.close()
+    conn.close()
+
+    return render_template("dashboard.html", policies=policies)
+
+
+@app.route("/add-policy", methods=["GET", "POST"])
+def add_policy():
+    if "user_id" not in session:
+        return redirect("/login")
+
+    if request.method == "POST":
+        title = request.form["title"]
+        summary = request.form["summary"]
+
+        conn = get_db_connection()
+        cur = conn.cursor()
+
+        cur.execute(
+            "INSERT INTO policies (user_id, title, summary, sentiment) VALUES (%s, %s, %s, %s)",
+            (session["user_id"], title, summary, "neutral")
+        )
+
+        conn.commit()
+        cur.close()
+        conn.close()
+
+        return redirect("/dashboard")
+
+    return render_template("add_policy.html")
 
 @app.route("/logout")
 def logout():
