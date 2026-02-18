@@ -380,6 +380,15 @@ def admin_panel():
 )
 
 
+@app.route("/test-gemini")
+def test_gemini():
+    import os
+    key = os.getenv("GOOGLE_API_KEY")
+    if key:
+        return "Gemini API Key Found"
+    return "Gemini API Key Missing"
+
+
 
 
 @app.route("/logout")
