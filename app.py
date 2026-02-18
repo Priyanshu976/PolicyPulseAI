@@ -3,6 +3,7 @@ from flask import Flask
 from dotenv import load_dotenv
 import psycopg2
 
+
 load_dotenv()
 
 app = Flask(__name__)
@@ -66,6 +67,35 @@ def init_db():
         return "Tables created successfully!"
     except Exception as e:
         return f"Error creating tables: {e}"
+
+
+
+from werkzeug.security import generate_password_hash
+
+@app.route("/test-register")
+def test_register():
+    try:
+        conn = get_db_connection()
+        cur = conn.cursor()
+
+        hashed_password = generate_password_hash("test123")
+
+        cur.execute(
+            "INSERT INTO users (name, email, password) VALUES (%s, %s, %s) RETURNING id;",
+            ("Test User", "test@example.com", hashed_password)
+        )
+
+        user_id = cur.fetchone()[0]
+
+        conn.commit()
+        cur.close()
+        conn.close()
+
+        return f"Test user created with ID: {user_id}"
+
+    except Exception as e:
+        return f"Error inserting user: {e}"
+
 
 
 
