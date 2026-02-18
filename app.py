@@ -120,11 +120,23 @@ def login():
 
         if user and check_password_hash(user[1], password):
             session["user_id"] = user[0]
-            return "Login successful!"
+            return redirect("/dashboard")
 
         return "Invalid credentials."
 
     return render_template("login.html")
+
+@app.route("/dashboard")
+def dashboard():
+    if "user_id" not in session:
+        return redirect("/login")
+
+    return render_template("dashboard.html")
+
+@app.route("/logout")
+def logout():
+    session.clear()
+    return redirect("/login")
 
 
 
