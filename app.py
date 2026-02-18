@@ -225,17 +225,40 @@ def dashboard():
     conn = get_db_connection()
     cur = conn.cursor()
 
+    # Fetch user policies
     cur.execute(
         "SELECT title, summary, created_at, sentiment, keywords FROM policies WHERE user_id=%s ORDER BY created_at DESC",
         (session["user_id"],)
     )
-
     policies = cur.fetchall()
+
+    # Total policies
+    total_policies = len(policies)
+
+    # Sentiment counts
+    sentiment_counts = {"Positive": 0, "Negative": 0, "Neutral": 0}
+    all_keywords = []
+
+    for policy in policies:
+        sentiment_counts[policy[3]] += 1
+
+        if policy[4]:
+            all_keywords.extend(policy[4].split(", "))
+
+    # Most common keywords
+    keyword_freq = Counter(all_keywords)
+    top_keywords = keyword_freq.most_common(5)
 
     cur.close()
     conn.close()
 
-    return render_template("dashboard.html", policies=policies)
+    return render_template(
+        "dashboard.html",
+        policies=policies,
+        total_policies=total_policies,
+        sentiment_counts=sentiment_counts,
+        top_keywords=top_keywords
+    )
 
 
 @app.route("/add-policy", methods=["GET", "POST"])

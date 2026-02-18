@@ -7,6 +7,27 @@
     <a href="/logout">Logout</a>
     <a href="/upload-policy">Upload New Policy (PDF)</a>
 
+    <h3>Analytics</h3>
+
+    <p><strong>Total Policies:</strong> {{ total_policies }}</p>
+
+    <p><strong>Sentiment Distribution:</strong></p>
+    <ul>
+    <li>Positive: {{ sentiment_counts["Positive"] }}</li>
+    <li>Negative: {{ sentiment_counts["Negative"] }}</li>
+    <li>Neutral: {{ sentiment_counts["Neutral"] }}</li>
+    </ul>
+
+    <p><strong>Top Keywords:</strong></p>
+    <ul>
+    {% for word, count in top_keywords %}
+    <li>{{ word }} ({{ count }})</li>
+    {% else %}
+    <li>No keywords yet.</li>
+    {% endfor %}
+    </ul>
+
+    <hr>
 
     <h3>Your Policies</h3>
 
