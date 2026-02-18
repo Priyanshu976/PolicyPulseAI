@@ -59,6 +59,30 @@ def generate_summary(text, num_sentences=5):
 
     return summary
 
+def analyze_sentiment(text):
+    positive_words = {
+        "growth", "benefit", "improve", "support", "development",
+        "increase", "success", "empower", "opportunity", "progress"
+    }
+
+    negative_words = {
+        "risk", "decline", "problem", "crisis", "loss",
+        "decrease", "burden", "failure", "issue", "threat"
+    }
+
+    text = text.lower()
+    words = re.findall(r'\w+', text)
+
+    positive_score = sum(1 for word in words if word in positive_words)
+    negative_score = sum(1 for word in words if word in negative_words)
+
+    if positive_score > negative_score:
+        return "Positive"
+    elif negative_score > positive_score:
+        return "Negative"
+    else:
+        return "Neutral"
+
 
 @app.route("/")
 def home():
@@ -179,7 +203,7 @@ def dashboard():
     cur = conn.cursor()
 
     cur.execute(
-        "SELECT title, summary, created_at FROM policies WHERE user_id=%s ORDER BY created_at DESC",
+        "SELECT title, summary, created_at, sentiment FROM policies WHERE user_id=%s ORDER BY created_at DESC",
         (session["user_id"],)
     )
 
@@ -231,13 +255,15 @@ def upload_policy():
         try:
             text = extract_text_from_pdf(pdf_file)
             summary = generate_summary(text)
+            sentiment = analyze_sentiment(summary)
 
             conn = get_db_connection()
             cur = conn.cursor()
 
             cur.execute(
                 "INSERT INTO policies (user_id, title, summary, sentiment) VALUES (%s, %s, %s, %s)",
-                (session["user_id"], title, summary, "neutral")
+                (session["user_id"], title, summary, sentiment)
+
             )
 
             conn.commit()
