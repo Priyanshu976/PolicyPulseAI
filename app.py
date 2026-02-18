@@ -201,7 +201,7 @@ def login():
         cur = conn.cursor()
 
         cur.execute(
-            "SELECT id, password FROM users WHERE email=%s",
+            "SELECT id, password, role FROM users WHERE email=%s",
             (email,)
         )
         user = cur.fetchone()
@@ -211,6 +211,7 @@ def login():
 
         if user and check_password_hash(user[1], password):
             session["user_id"] = user[0]
+            session["role"] = user[2]
             return redirect("/dashboard")
 
         return "Invalid credentials."
@@ -329,6 +330,68 @@ def upload_policy():
             return f"Error processing PDF: {e}"
 
     return render_template("upload_policy.html")
+
+@app.route("/admin")
+def admin_dashboard():
+    if "user_id" not in session or session.get("role") != "admin":
+        return "Access Denied"
+
+    conn = get_db_connection()
+    cur = conn.cursor()
+
+    # Total users
+    cur.execute("SELECT COUNT(*) FROM users")
+    total_users = cur.fetchone()[0]
+
+    # Total policies
+    cur.execute("SELECT COUNT(*) FROM policies")
+    total_policies = cur.fetchone()[0]
+
+    # Sentiment distribution
+    cur.execute("SELECT sentiment, COUNT(*) FROM policies GROUP BY sentiment")
+    sentiment_data = cur.fetchall()
+
+    sentiment_counts = {"Positive": 0, "Negative": 0, "Neutral": 0}
+    for sentiment, count in sentiment_data:
+        sentiment_counts[sentiment] = count
+
+    # Top keywords
+    cur.execute("SELECT keywords FROM policies WHERE keywords IS NOT NULL")
+    keyword_rows = cur.fetchall()
+
+    all_keywords = []
+    for row in keyword_rows:
+        all_keywords.extend(row[0].split(", "))
+
+    keyword_freq = Counter(all_keywords)
+    top_keywords = keyword_freq.most_common(5)
+
+    cur.close()
+    conn.close()
+
+    return render_template(
+        "admin_dashboard.html",
+        total_users=total_users,
+        total_policies=total_policies,
+        sentiment_counts=sentiment_counts,
+        top_keywords=top_keywords
+    )
+
+@app.route("/promote-admin")
+def promote_admin():
+    conn = get_db_connection()
+    cur = conn.cursor()
+
+    cur.execute(
+        "UPDATE users SET role='admin' WHERE email=%s",
+        ("test@example.com",)
+    )
+
+    conn.commit()
+    cur.close()
+    conn.close()
+
+    return "Admin promoted successfully."
 
 
 @app.route("/logout")

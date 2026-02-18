@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<body>
+    <h2>Admin Dashboard</h2>
+
+    <p><strong>Total Users:</strong> {{ total_users }}</p>
+    <p><strong>Total Policies:</strong> {{ total_policies }}</p>
+
+    <h3>Sentiment Distribution</h3>
+    <ul>
+        <li>Positive: {{ sentiment_counts["Positive"] }}</li>
+        <li>Negative: {{ sentiment_counts["Negative"] }}</li>
+        <li>Neutral: {{ sentiment_counts["Neutral"] }}</li>
+    </ul>
+
+    <h3>Top Keywords (System-wide)</h3>
+    <ul>
+        {% for word, count in top_keywords %}
+            <li>{{ word }} ({{ count }})</li>
+        {% else %}
+            <li>No data available.</li>
+        {% endfor %}
+    </ul>
+
+    <br>
+    <a href="/dashboard">Back to User Dashboard</a>
+</body>
+</html>
