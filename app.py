@@ -6,6 +6,11 @@ import PyPDF2
 import re
 from collections import Counter
 
+STOPWORDS = {
+    "the", "is", "in", "and", "to", "of", "for", "on", "with",
+    "as", "by", "an", "be", "this", "that", "are", "from",
+    "at", "or", "it", "was", "will", "has", "have"
+}
 
 
 
@@ -83,6 +88,22 @@ def analyze_sentiment(text):
     else:
         return "Neutral"
 
+def extract_keywords(text, top_n=8):
+    words = re.findall(r'\w+', text.lower())
+
+    filtered_words = [
+        word for word in words
+        if word not in STOPWORDS and len(word) > 3
+    ]
+
+    word_freq = Counter(filtered_words)
+
+    most_common = word_freq.most_common(top_n)
+
+    keywords = [word for word, freq in most_common]
+
+    return ", ".join(keywords)
+
 
 @app.route("/")
 def home():
@@ -125,9 +146,11 @@ def init_db():
                 title VARCHAR(200),
                 summary TEXT,
                 sentiment VARCHAR(20),
+                keywords TEXT,
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             );
         """)
+        cur.execute("ALTER TABLE policies ADD COLUMN IF NOT EXISTS keywords TEXT;")
 
         conn.commit()
         cur.close()
@@ -203,7 +226,7 @@ def dashboard():
     cur = conn.cursor()
 
     cur.execute(
-        "SELECT title, summary, created_at, sentiment FROM policies WHERE user_id=%s ORDER BY created_at DESC",
+        "SELECT title, summary, created_at, sentiment, keywords FROM policies WHERE user_id=%s ORDER BY created_at DESC",
         (session["user_id"],)
     )
 
@@ -256,13 +279,15 @@ def upload_policy():
             text = extract_text_from_pdf(pdf_file)
             summary = generate_summary(text)
             sentiment = analyze_sentiment(summary)
+            keywords = extract_keywords(summary)
+
 
             conn = get_db_connection()
             cur = conn.cursor()
 
             cur.execute(
-                "INSERT INTO policies (user_id, title, summary, sentiment) VALUES (%s, %s, %s, %s)",
-                (session["user_id"], title, summary, sentiment)
+                "INSERT INTO policies (user_id, title, summary, sentiment, keywords) VALUES (%s, %s, %s, %s, %s)",
+                (session["user_id"], title, summary, sentiment, keywords)
 
             )
 
