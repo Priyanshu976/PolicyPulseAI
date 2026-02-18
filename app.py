@@ -380,15 +380,20 @@ def admin_panel():
 )
 
 
-@app.route("/test-gemini")
-def test_gemini():
-    import os
-    key = os.getenv("GOOGLE_API_KEY")
-    if key:
-        return "Gemini API Key Found"
-    return "Gemini API Key Missing"
+import google.generativeai as genai
 
+genai.configure(api_key=os.getenv("GOOGLE_API_KEY"))
 
+@app.route("/test-scheme-ai")
+def test_scheme_ai():
+    try:
+        model = genai.GenerativeModel("gemini-1.5-flash")
+        response = model.generate_content(
+            "List 3 government schemes in India for students."
+        )
+        return response.text
+    except Exception as e:
+        return f"Error: {e}"
 
 
 @app.route("/logout")
