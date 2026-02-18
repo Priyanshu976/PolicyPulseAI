@@ -371,19 +371,14 @@ def admin_panel():
     cur.close()
     conn.close()
 
-    return f"""
-    Admin Panel Working <br>
-    Total Users: {total_users} <br>
-    Total Policies: {total_policies} <br><br>
+    return render_template(
+    "admin_dashboard.html",
+    total_users=total_users,
+    total_policies=total_policies,
+    sentiment_counts=sentiment_counts,
+    top_keywords=top_keywords
+)
 
-    Sentiment Distribution:<br>
-    Positive: {sentiment_counts['Positive']} <br>
-    Negative: {sentiment_counts['Negative']} <br>
-    Neutral: {sentiment_counts['Neutral']} <br><br>
-
-    Top Keywords:<br>
-    {top_keywords}
-    """
 
 
 
