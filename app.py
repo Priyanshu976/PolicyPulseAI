@@ -350,7 +350,14 @@ def admin_panel():
     total_users = cur.fetchone()[0]
     cur.execute("SELECT COUNT(*) FROM policies")
     total_policies = cur.fetchone()[0]
-
+    cur.execute("SELECT sentiment, COUNT(*) FROM policies GROUP BY sentiment")
+    sentiment_data = cur.fetchall()
+    sentiment_counts = {"Positive": 0, "Negative": 0, "Neutral": 0}
+    for sentiment, count in sentiment_data:
+        if sentiment:
+            formatted = sentiment.capitalize()
+            if formatted in sentiment_counts:
+                sentiment_counts[formatted] = count
 
     cur.close()
     conn.close()
@@ -358,8 +365,14 @@ def admin_panel():
     return f"""
     Admin Panel Working <br>
     Total Users: {total_users} <br>
-    Total Policies: {total_policies}
+    Total Policies: {total_policies} <br><br>
+
+    Sentiment Distribution:<br>
+    Positive: {sentiment_counts['Positive']} <br>
+    Negative: {sentiment_counts['Negative']} <br>
+    Neutral: {sentiment_counts['Neutral']}
     """
+
 
 
 
