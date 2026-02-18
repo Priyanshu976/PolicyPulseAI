@@ -240,7 +240,12 @@ def dashboard():
     all_keywords = []
 
     for policy in policies:
-        sentiment_counts[policy[3]] += 1
+        raw_sentiment = policy[3]
+
+        if raw_sentiment:
+            sentiment = raw_sentiment.capitalize()
+            if sentiment in sentiment_counts:
+                sentiment_counts[sentiment] += 1
 
         if policy[4]:
             all_keywords.extend(policy[4].split(", "))
@@ -248,6 +253,7 @@ def dashboard():
     # Most common keywords
     keyword_freq = Counter(all_keywords)
     top_keywords = keyword_freq.most_common(5)
+
 
     cur.close()
     conn.close()
