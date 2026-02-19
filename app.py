@@ -380,16 +380,21 @@ def admin_panel():
 )
 
 
-import google.generativeai as genai
-
-genai.configure(api_key=os.getenv("GOOGLE_API_KEY"))
-
 @app.route("/scheme-advisor", methods=["GET", "POST"])
 def scheme_advisor():
     if "user_id" not in session:
         return redirect("/login")
 
     if request.method == "POST":
+        # ✅ Extract form data first
+        age = request.form.get("age")
+        gender = request.form.get("gender")
+        income = request.form.get("income")
+        occupation = request.form.get("occupation")
+        state = request.form.get("state")
+        area_type = request.form.get("area_type")
+        need = request.form.get("need")
+
         try:
             import google.generativeai as genai
             genai.configure(api_key=os.getenv("GOOGLE_API_KEY"))
@@ -397,41 +402,39 @@ def scheme_advisor():
             model = genai.GenerativeModel("gemini-2.5-flash")
 
             prompt = f"""
-            You are an AI Government Scheme Advisor for Indian citizens.
+                You are an AI Government Scheme Advisor for Indian citizens.
 
-            Based on the following user profile, recommend suitable government schemes.
+                Based on the following user profile, recommend suitable government schemes.
 
-            Profile:
-            Age: {age}
-            Gender: {gender}
-            Monthly Income: {income}
-            Occupation: {occupation}
-            State: {state}
-            Area Type: {area_type}
-            Need: {need}
+                Profile:
+                Age: {age}
+                Gender: {gender}
+                Monthly Income: {income}
+                Occupation: {occupation}
+                State: {state}
+                Area Type: {area_type}
+                Need: {need}
 
-            Instructions:
-            - Provide 3 to 5 relevant schemes.
-            - For each scheme, clearly mention:
+                Instructions:
+                - Provide 3 to 5 relevant schemes.
+                - For each scheme clearly mention:
                 1. Scheme Name
                 2. Key Benefits
                 3. Eligibility
                 4. How to Apply
-            - Do NOT use markdown.
-            - Do NOT mention canvas.
-            - Do NOT use special formatting.
-            - Provide clean plain text output only.
-            """
+                - Provide clean plain text only.
+                """
 
             response = model.generate_content(prompt)
-
             advice = response.text if response and response.text else "No recommendation generated."
 
             return render_template("scheme_result.html", advice=advice)
 
         except Exception as e:
             return f"Error: {e}"
+
     return render_template("scheme_form.html")
+
 
 
 
