@@ -431,6 +431,8 @@ def scheme_advisor():
 
         except Exception as e:
             return f"Error: {e}"
+    return render_template("scheme_form.html")
+
 
 
 
