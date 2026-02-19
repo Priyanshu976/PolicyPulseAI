@@ -395,14 +395,42 @@ def scheme_advisor():
             genai.configure(api_key=os.getenv("GOOGLE_API_KEY"))
 
             model = genai.GenerativeModel("gemini-2.5-flash")
-            response = model.generate_content("Test prompt")
 
-            return response.text
+            prompt = f"""
+            You are an AI Government Scheme Advisor for Indian citizens.
+
+            Based on the following user profile, recommend suitable government schemes.
+
+            Profile:
+            Age: {age}
+            Gender: {gender}
+            Monthly Income: {income}
+            Occupation: {occupation}
+            State: {state}
+            Area Type: {area_type}
+            Need: {need}
+
+            Instructions:
+            - Provide 3 to 5 relevant schemes.
+            - For each scheme, clearly mention:
+                1. Scheme Name
+                2. Key Benefits
+                3. Eligibility
+                4. How to Apply
+            - Do NOT use markdown.
+            - Do NOT mention canvas.
+            - Do NOT use special formatting.
+            - Provide clean plain text output only.
+            """
+
+            response = model.generate_content(prompt)
+
+            advice = response.text if response and response.text else "No recommendation generated."
+
+            return render_template("scheme_result.html", advice=advice)
 
         except Exception as e:
             return f"Error: {e}"
-
-    return render_template("scheme_form.html")
 
 
 
