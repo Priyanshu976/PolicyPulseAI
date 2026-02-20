@@ -5,16 +5,24 @@
 </head>
 <body>
     
-<div style="background:#222;color:white;padding:10px;">
-    <a href="/dashboard" style="color:white;margin-right:15px;">Dashboard</a>
-    <a href="/upload-policy" style="color:white;margin-right:15px;">Upload Policy</a>
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 
-    {% if session.get("role") == "admin" %}
-        <a href="/admin" style="color:white;margin-right:15px;">Admin Panel</a>
-    {% endif %}
+<div class="navbar">
+    <div>
+        <a href="/dashboard">Policy Pulse AI</a>
+        <a href="/upload-policy">Upload Policy</a>
+        <a href="/scheme-advisor">Scheme Advisor</a>
 
-    <a href="/logout" style="color:white;">Logout</a>
+        {% if session.get("role") == "admin" %}
+            <a href="/admin">Admin</a>
+        {% endif %}
+    </div>
+    <div>
+        <a href="/logout">Logout</a>
+    </div>
 </div>
+
+<div class="container">
 <hr>
 
 <h2>Admin Dashboard</h2>
@@ -41,6 +49,6 @@
 
 <br>
 <a href="/dashboard">Back to User Dashboard</a>
-
+</div>
 </body>
 </html>

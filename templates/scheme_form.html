@@ -5,6 +5,25 @@
 </head>
 <body>
 
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
+<div class="navbar">
+    <div>
+        <a href="/dashboard">Policy Pulse AI</a>
+        <a href="/upload-policy">Upload Policy</a>
+        <a href="/scheme-advisor">Scheme Advisor</a>
+
+        {% if session.get("role") == "admin" %}
+            <a href="/admin">Admin</a>
+        {% endif %}
+    </div>
+    <div>
+        <a href="/logout">Logout</a>
+    </div>
+</div>
+
+<div class="container">
+
 <h2>AI Government Scheme Advisor</h2>
 
 <form method="POST">
@@ -48,5 +67,6 @@
 <br>
 <a href="/dashboard">Back to Dashboard</a>
 
+</div>
 </body>
 </html>
