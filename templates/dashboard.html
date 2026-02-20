@@ -29,23 +29,26 @@
 
     <h3>Analytics</h3>
 
-    <p><strong>Total Policies:</strong> {{ total_policies }}</p>
+        <div class="card">
+            <h3>Total Policies</h3>
+            <p>{{ total_policies }}</p>
+        </div>
 
-    <p><strong>Sentiment Distribution:</strong></p>
-    <ul>
-    <li>Positive: {{ sentiment_counts["Positive"] }}</li>
-    <li>Negative: {{ sentiment_counts["Negative"] }}</li>
-    <li>Neutral: {{ sentiment_counts["Neutral"] }}</li>
-    </ul>
+        <div class="card">
+            <h3>Sentiment Distribution</h3>
+            <p>Positive: {{ sentiment_counts["Positive"] }}</p>
+            <p>Negative: {{ sentiment_counts["Negative"] }}</p>
+            <p>Neutral: {{ sentiment_counts["Neutral"] }}</p>
+        </div>
 
-    <p><strong>Top Keywords:</strong></p>
-    <ul>
-    {% for word, count in top_keywords %}
-    <li>{{ word }} ({{ count }})</li>
-    {% else %}
-    <li>No keywords yet.</li>
-    {% endfor %}
-    </ul>
+        <div class="card">
+            <h3>Top Keywords</h3>
+            <ul>
+                {% for word, count in top_keywords %}
+                    <li>{{ word }} ({{ count }})</li>
+                {% endfor %}
+            </ul>
+        </div>
 
     <hr>
 
