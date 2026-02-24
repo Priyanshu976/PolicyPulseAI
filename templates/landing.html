@@ -5,6 +5,13 @@
 </head>
 <body class="landing-body">
 
+<!-- Background Video (Optional) -->
+<video autoplay muted loop class="bg-video">
+    <source src="{{ url_for('static', filename='videos/ai_bg.mp4') }}" type="video/mp4">
+</video>
+
+<div class="overlay"></div>
+
 <nav class="landing-nav">
     <div class="brand">Policy Pulse AI</div>
     <div>
@@ -14,54 +21,72 @@
 </nav>
 
 <section class="hero">
-    <h1>AI-Powered Policy Intelligence Platform</h1>
-    <p>
-        Analyze government policies, measure impact, detect similarities,
-        and get intelligent recommendations — all powered by AI.
-    </p>
-    <div class="hero-buttons">
-        <a href="/login" class="primary-btn">Get Started</a>
-        <a href="#features" class="outline-btn">Learn More</a>
+    <div class="hero-content">
+        <h1>Reimagining Policy Intelligence with AI</h1>
+        <p>
+            Summarize. Analyze. Compare. Score.
+            Experience the future of government decision systems.
+        </p>
+        <div class="hero-buttons">
+            <a href="/login" class="primary-btn">Launch Platform</a>
+            <a href="#features" class="outline-btn">Explore Features</a>
+        </div>
+    </div>
+</section>
+
+<section class="stats">
+    <div class="stat-box">
+        <h2>10x</h2>
+        <p>Faster Policy Analysis</p>
+    </div>
+    <div class="stat-box">
+        <h2>AI Powered</h2>
+        <p>Semantic Intelligence</p>
+    </div>
+    <div class="stat-box">
+        <h2>Secure</h2>
+        <p>Cloud Architecture</p>
     </div>
 </section>
 
 <section id="features" class="features">
-    <h2>What We Provide</h2>
-
+    <h2>Platform Capabilities</h2>
     <div class="feature-grid">
         <div class="feature-card">
-            <h3>Smart Summarization</h3>
-            <p>Extract key insights from large policy PDFs instantly.</p>
+            <h3>Smart Summaries</h3>
+            <p>Extract key insights from large documents instantly.</p>
         </div>
-
         <div class="feature-card">
             <h3>Impact Scoring</h3>
-            <p>Evaluate development focus using AI-based scoring.</p>
+            <p>Measure development focus using weighted AI models.</p>
         </div>
-
         <div class="feature-card">
-            <h3>Policy Similarity</h3>
-            <p>Detect related policies using vector similarity modeling.</p>
+            <h3>Similarity Engine</h3>
+            <p>Detect overlapping policies using vector modeling.</p>
         </div>
-
         <div class="feature-card">
-            <h3>AI Scheme Advisor</h3>
-            <p>Get personalized government scheme recommendations.</p>
+            <h3>Scheme Advisor</h3>
+            <p>Personalized AI recommendations for citizens.</p>
         </div>
     </div>
 </section>
 
-<section class="about">
-    <h2>Why Policy Pulse AI?</h2>
-    <p>
-        Built using Flask, PostgreSQL, and Gemini AI,
-        Policy Pulse AI bridges governance and intelligence
-        to empower decision-makers and citizens alike.
-    </p>
+<section class="how-it-works">
+    <h2>How It Works</h2>
+    <div class="steps">
+        <div class="step">Upload Policy PDF</div>
+        <div class="step">AI Analysis</div>
+        <div class="step">Insight Dashboard</div>
+    </div>
+</section>
+
+<section class="team">
+    <h2>Built With Intelligence</h2>
+    <p>Developed using Flask, PostgreSQL, and Google Gemini AI.</p>
 </section>
 
 <footer class="landing-footer">
-    © 2026 Policy Pulse AI | Built with AI & Innovation
+   Developed by Priyanshu Gajghate © 2026 Policy Pulse AI
 </footer>
 
 </body>
