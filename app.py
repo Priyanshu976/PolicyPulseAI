@@ -273,7 +273,7 @@ def dashboard():
     cur = conn.cursor()
 
     cur.execute(
-        "SELECT title, summary, created_at, sentiment, keywords FROM policies WHERE user_id=%s ORDER BY created_at DESC",
+        "SELECT title, summary, created_at, sentiment, keywords, impact_score FROM policies WHERE user_id=%s ORDER BY created_at DESC",
         (session["user_id"],)
     )
     policies = cur.fetchall()
@@ -289,6 +289,7 @@ def dashboard():
     }
 
     all_keywords = []
+    total_impact = 0
 
     for policy in policies:
         raw_sentiment = policy[3]
@@ -298,6 +299,10 @@ def dashboard():
 
         if policy[4]:
             all_keywords.extend(policy[4].split(", "))
+            
+        impact = policy[5] if policy[5] else 0
+        total_impact += impact
+    average_impact = round(total_impact / total_policies, 2) if total_policies > 0 else 0
 
     keyword_freq = Counter(all_keywords)
     top_keywords = keyword_freq.most_common(5)
@@ -310,7 +315,8 @@ def dashboard():
         policies=policies,
         total_policies=total_policies,
         sentiment_counts=sentiment_counts,
-        top_keywords=top_keywords
+        top_keywords=top_keywords,
+        average_impact=average_impact
     )
 
 
