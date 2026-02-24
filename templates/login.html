@@ -7,7 +7,7 @@
 <body class="login-body">
 
 <div class="login-container">
-
+    <a href="/" class="close-btn">✕</a>
     <div class="login-left">
         <h2>Welcome Back</h2>
         <p>Access your AI-powered policy dashboard.</p>
@@ -24,10 +24,18 @@
         </p>
     </div>
 
-    <div class="login-right">
-        <h3>AI Insight</h3>
-        <p>{{ ai_message }}</p>
+<div class="login-right">
+    <h2 class="ai-title">AI Insight</h2>
+
+    <div class="ai-quote">
+        <span class="quote-mark">“</span>
+        {{ ai_message }}
     </div>
+
+    <div class="ai-footer">
+        Powered by Gemini AI
+    </div>
+</div>
 
 </div>
 
