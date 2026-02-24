@@ -281,19 +281,20 @@ def dashboard():
     total_policies = len(policies)
 
     # Sentiment counts
-    sentiment_counts = {"Positive": 0, "Negative": 0, "Neutral": 0}
+    sentiment_counts = {
+    "Development-Oriented": 0,
+    "Welfare-Focused": 0,
+    "Regulatory/Strict": 0,
+    "Critical/Risk": 0,
+    "Neutral": 0
+    }
     all_keywords = []
 
-    for policy in policies:
-        raw_sentiment = policy[3]
-
-        if raw_sentiment:
-            sentiment = raw_sentiment.capitalize()
-            if sentiment in sentiment_counts:
-                sentiment_counts[sentiment] += 1
-
-        if policy[4]:
-            all_keywords.extend(policy[4].split(", "))
+    raw_sentiment = policy[3]
+    if raw_sentiment and raw_sentiment in sentiment_counts:
+            sentiment_counts[raw_sentiment] += 1
+    if policy[4]:
+        all_keywords.extend(policy[4].split(", "))
 
     # Most common keywords
     keyword_freq = Counter(all_keywords)
@@ -402,12 +403,17 @@ def admin_panel():
     total_policies = cur.fetchone()[0]
     cur.execute("SELECT sentiment, COUNT(*) FROM policies GROUP BY sentiment")
     sentiment_data = cur.fetchall()
-    sentiment_counts = {"Positive": 0, "Negative": 0, "Neutral": 0}
+    sentiment_counts = {
+        "Development-Oriented": 0,
+        "Welfare-Focused": 0,
+        "Regulatory/Strict": 0,
+        "Critical/Risk": 0,
+        "Neutral": 0
+    }
     for sentiment, count in sentiment_data:
-        if sentiment:
-            formatted = sentiment.capitalize()
-            if formatted in sentiment_counts:
-                sentiment_counts[formatted] = count
+        if sentiment in sentiment_counts:
+            sentiment_counts[sentiment] = count
+            
     cur.execute("SELECT keywords FROM policies WHERE keywords IS NOT NULL")
     keyword_rows = cur.fetchall()
     all_keywords = []
