@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Policy Pulse AI</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+<div class="sidebar">
+    <h2 class="logo">Policy Pulse AI</h2>
+
+    <a href="/dashboard">Dashboard</a>
+    <a href="/upload-policy">Upload Policy</a>
+    <a href="/scheme-advisor">Scheme Advisor</a>
+
+    {% if session.get("role") == "admin" %}
+        <a href="/admin">Admin</a>
+    {% endif %}
+
+    <a href="/logout" class="logout">Logout</a>
+</div>
+
+<div class="main-content">
+    {% block content %}{% endblock %}
+</div>
+
+</body>
+</html>

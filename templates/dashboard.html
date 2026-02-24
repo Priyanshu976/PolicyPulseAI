@@ -1,80 +1,49 @@
-<!DOCTYPE html>
-<html>
-<body>
+{% extends "base.html" %}
 
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+{% block content %}
 
-    <div class="navbar">
-        <div>
-            <a href="/dashboard">Policy Pulse AI</a>
-            <a href="/upload-policy">Upload Policy</a>
-            <a href="/scheme-advisor">Scheme Advisor</a>
+<h1>Dashboard Overview</h1>
 
-            {% if session.get("role") == "admin" %}
-                <a href="/admin">Admin</a>
-            {% endif %}
-        </div>
-        <div>
-            <a href="/logout">Logout</a>
-        </div>
+<div class="analytics-grid">
+
+    <div class="card">
+        <h3>Total Policies</h3>
+        <div class="big-number">{{ total_policies }}</div>
     </div>
 
-<div class="container">
-
-    <h2>Dashboard</h2>
-
-    <a href="/add-policy">Add New Policy</a>
-    <a href="/logout">Logout</a>
-    <a href="/upload-policy">Upload New Policy (PDF)</a>
-
-    <h3>Analytics</h3>
-
-        <div class="card">
-            <h3>Total Policies</h3>
-            <p>{{ total_policies }}</p>
-        </div>
-
-        <div class="card">
-            <h3>Sentiment Distribution</h3>
-
-            {% for category, count in sentiment_counts.items() %}
-                <p>{{ category }}: {{ count }}</p>
-            {% endfor %}
-
-        </div>
-
-        <div class="card">
-            <h3>Top Keywords</h3>
-            <ul>
-                {% for word, count in top_keywords %}
-                    <li>{{ word }} ({{ count }})</li>
-                {% endfor %}
-            </ul>
-        </div>
-
-        <div class="card">
-            <h3>Average Impact Score</h3>
-            <p>{{ average_impact }}/100</p>
-        </div>
-
-    <hr>
-
-    <h3>Your Policies</h3>
-
-    {% for policy in policies %}
-        <div>
-            <h4>{{ policy[0] }}</h4>
-            <p>{{ policy[1] }}</p>
-            <p><strong>Sentiment:</strong> {{ policy[3] }}</p>
-            <p><strong>Keywords:</strong> {{ policy[4] }}</p>
-            <small>{{ policy[2] }}</small>
-            <hr>
-        </div>
-    {% else %}
-        <p>No policies yet.</p>
-    {% endfor %}
-
+    <div class="card">
+        <h3>Average Impact Score</h3>
+        <div class="big-number">{{ average_impact }}/100</div>
+    </div>
 
 </div>
-</body>
-</html>
+
+<div class="card">
+    <h3>Sentiment Distribution</h3>
+    <canvas id="sentimentChart"></canvas>
+</div>
+
+<div class="card">
+    <h3>Top Keywords</h3>
+    <ul>
+        {% for word, count in top_keywords %}
+            <li>{{ word }} ({{ count }})</li>
+        {% endfor %}
+    </ul>
+</div>
+
+<script>
+    const ctx = document.getElementById('sentimentChart');
+
+    new Chart(ctx, {
+        type: 'pie',
+        data: {
+            labels: {{ sentiment_counts.keys()|list|tojson }},
+            datasets: [{
+                data: {{ sentiment_counts.values()|list|tojson }},
+            }]
+        }
+    });
+</script>
+
+{% endblock %}
