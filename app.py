@@ -185,16 +185,18 @@ def init_db():
 
         cur.execute("""
             CREATE TABLE IF NOT EXISTS policies (
-                id SERIAL PRIMARY KEY,
-                user_id INTEGER REFERENCES users(id),
-                title VARCHAR(200),
-                summary TEXT,
-                sentiment VARCHAR(20),
-                keywords TEXT,
-                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-            );
+            id SERIAL PRIMARY KEY,
+            user_id INTEGER REFERENCES users(id),
+            title VARCHAR(200),
+            summary TEXT,
+            sentiment VARCHAR(50),
+            keywords TEXT,
+            impact_score INTEGER,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        );
         """)
         cur.execute("ALTER TABLE policies ADD COLUMN IF NOT EXISTS keywords TEXT;")
+        cur.execute("ALTER TABLE policies ADD COLUMN IF NOT EXISTS impact_score INTEGER;")
 
         conn.commit()
         cur.close()
@@ -363,9 +365,8 @@ def upload_policy():
             cur = conn.cursor()
 
             cur.execute(
-                "INSERT INTO policies (user_id, title, summary, sentiment, keywords) VALUES (%s, %s, %s, %s, %s)",
-                (session["user_id"], title, summary, sentiment, keywords)
-
+                "INSERT INTO policies (user_id, title, summary, sentiment, keywords, impact_score) VALUES (%s, %s, %s, %s, %s, %s)",
+                (session["user_id"], title, summary, sentiment, keywords, impact_score)
             )
 
             conn.commit()
