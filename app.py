@@ -18,6 +18,7 @@ load_dotenv()
 
 app = Flask(__name__)
 app.secret_key = os.getenv("SECRET_KEY")
+app.config['MAX_CONTENT_LENGTH'] = 10 * 1024 * 1024  # 10 MB limit
 
 DATABASE_URL = os.getenv("DATABASE_URL")
 
@@ -39,58 +40,72 @@ def extract_text_from_pdf(file):
     return text
 
 def generate_summary(text, num_sentences=5):
-    # Clean text
     text = re.sub(r'\s+', ' ', text)
-
-    # Split into sentences
     sentences = re.split(r'(?<=[.!?]) +', text)
 
     if len(sentences) <= num_sentences:
         return text
 
-    # Word frequency
     words = re.findall(r'\w+', text.lower())
-    word_freq = Counter(words)
+
+    # Remove stopwords
+    filtered_words = [
+        word for word in words
+        if word not in STOPWORDS and len(word) > 3
+    ]
+
+    word_freq = Counter(filtered_words)
 
     sentence_scores = {}
 
     for sentence in sentences:
+        sentence_word_count = 0
         for word in re.findall(r'\w+', sentence.lower()):
             if word in word_freq:
                 sentence_scores[sentence] = sentence_scores.get(sentence, 0) + word_freq[word]
+                sentence_word_count += 1
 
-    # Sort sentences by score
+        # Normalize by sentence length
+        if sentence in sentence_scores and sentence_word_count > 0:
+            sentence_scores[sentence] /= sentence_word_count
+
     ranked_sentences = sorted(sentence_scores, key=sentence_scores.get, reverse=True)
-
-    summary_sentences = ranked_sentences[:num_sentences]
-
-    summary = " ".join(summary_sentences)
+    summary = " ".join(ranked_sentences[:num_sentences])
 
     return summary
 
 def analyze_sentiment(text):
-    positive_words = {
-        "growth", "benefit", "improve", "support", "development",
-        "increase", "success", "empower", "opportunity", "progress"
-    }
-
-    negative_words = {
-        "risk", "decline", "problem", "crisis", "loss",
-        "decrease", "burden", "failure", "issue", "threat"
+    categories = {
+        "Development-Oriented": {
+            "development", "infrastructure", "growth", "investment", "construction"
+        },
+        "Welfare-Focused": {
+            "subsidy", "benefit", "support", "assistance", "relief"
+        },
+        "Regulatory/Strict": {
+            "penalty", "compliance", "regulation", "law", "mandatory"
+        },
+        "Critical/Risk": {
+            "risk", "burden", "crisis", "loss", "threat"
+        }
     }
 
     text = text.lower()
     words = re.findall(r'\w+', text)
 
-    positive_score = sum(1 for word in words if word in positive_words)
-    negative_score = sum(1 for word in words if word in negative_words)
+    scores = {category: 0 for category in categories}
 
-    if positive_score > negative_score:
-        return "Positive"
-    elif negative_score > positive_score:
-        return "Negative"
-    else:
+    for word in words:
+        for category, keywords in categories.items():
+            if word in keywords:
+                scores[category] += 1
+
+    top_category = max(scores, key=scores.get)
+
+    if scores[top_category] == 0:
         return "Neutral"
+
+    return top_category
 
 def extract_keywords(text, top_n=8):
     words = re.findall(r'\w+', text.lower())
@@ -107,6 +122,31 @@ def extract_keywords(text, top_n=8):
     keywords = [word for word, freq in most_common]
 
     return ", ".join(keywords)
+
+def calculate_impact_score(text):
+    impact_keywords = {
+        "infrastructure": 5,
+        "development": 4,
+        "employment": 4,
+        "health": 3,
+        "education": 3,
+        "investment": 5,
+        "technology": 4,
+        "innovation": 4,
+        "agriculture": 3,
+        "subsidy": 2
+    }
+
+    text = text.lower()
+    words = re.findall(r'\w+', text)
+
+    score = 0
+
+    for word in words:
+        if word in impact_keywords:
+            score += impact_keywords[word]
+
+    return min(score, 100)
 
 
 @app.route("/")
@@ -307,12 +347,15 @@ def upload_policy():
 
         if pdf_file.filename == "":
             return "No file selected."
+        if not pdf_file.filename.lower().endswith(".pdf"):
+            return "Only PDF files are allowed."
 
         try:
             text = extract_text_from_pdf(pdf_file)
             summary = generate_summary(text)
             sentiment = analyze_sentiment(summary)
             keywords = extract_keywords(summary)
+            impact_score = calculate_impact_score(summary)
 
 
             conn = get_db_connection()
@@ -328,7 +371,14 @@ def upload_policy():
             cur.close()
             conn.close()
 
-            return f"<h3>Summary:</h3><p>{summary}</p><br><a href='/dashboard'>Back to Dashboard</a>"
+            return f"""
+            <h3>Summary:</h3>
+            <p>{summary}</p>
+
+            <h4>Impact Score: {impact_score}/100</h4>
+
+            <br><a href='/dashboard'>Back to Dashboard</a>
+            """
 
         except Exception as e:
             return f"Error processing PDF: {e}"
