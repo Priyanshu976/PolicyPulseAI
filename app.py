@@ -5,6 +5,8 @@ import psycopg2
 import PyPDF2
 import re
 from collections import Counter
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.metrics.pairwise import cosine_similarity
 
 STOPWORDS = {
     "the", "is", "in", "and", "to", "of", "for", "on", "with",
@@ -147,6 +149,40 @@ def calculate_impact_score(text):
             score += impact_keywords[word]
 
     return min(score, 100)
+
+def find_similar_policies(new_summary, existing_policies):
+    """
+    existing_policies = list of tuples (title, summary)
+    """
+
+    if not existing_policies:
+        return []
+
+    titles = [policy[0] for policy in existing_policies]
+    summaries = [policy[1] for policy in existing_policies]
+
+    # Add new summary at the end
+    all_documents = summaries + [new_summary]
+
+    vectorizer = TfidfVectorizer(stop_words="english")
+    tfidf_matrix = vectorizer.fit_transform(all_documents)
+
+    similarity_matrix = cosine_similarity(tfidf_matrix[-1], tfidf_matrix[:-1])
+
+    similarity_scores = similarity_matrix[0]
+
+    results = list(zip(titles, similarity_scores))
+
+    # Sort by similarity descending
+    results = sorted(results, key=lambda x: x[1], reverse=True)
+
+    # Return top 2
+    top_matches = [
+        (title, round(score * 100, 2))
+        for title, score in results[:2]
+    ]
+
+    return top_matches
 
 
 @app.route("/")
@@ -365,6 +401,8 @@ def upload_policy():
             sentiment = analyze_sentiment(summary)
             keywords = extract_keywords(summary)
             impact_score = calculate_impact_score(summary)
+            
+            summary = generate_summary(text)
 
 
             conn = get_db_connection()
