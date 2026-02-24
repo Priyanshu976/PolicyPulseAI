@@ -400,13 +400,19 @@ def upload_policy():
             summary = generate_summary(text)
             sentiment = analyze_sentiment(summary)
             keywords = extract_keywords(summary)
-            impact_score = calculate_impact_score(summary)
-            
-            summary = generate_summary(text)
-
+            impact_score = calculate_impact_score(summary)           
 
             conn = get_db_connection()
             cur = conn.cursor()
+            
+            cur.execute(
+                "SELECT title, summary FROM policies WHERE user_id=%s",
+                (session["user_id"],)
+            )
+            existing_policies = cur.fetchall()
+
+            # Compute similarity
+            similar_policies = find_similar_policies(summary, existing_policies)
 
             cur.execute(
                 "INSERT INTO policies (user_id, title, summary, sentiment, keywords, impact_score) VALUES (%s, %s, %s, %s, %s, %s)",
@@ -417,11 +423,20 @@ def upload_policy():
             cur.close()
             conn.close()
 
+            similar_html = ""
+            if similar_policies:
+                similar_html += "<h4>Similar Policies:</h4><ul>"
+                for title, score in similar_policies:
+                    similar_html += f"<li>{title} ({score}% similar)</li>"
+                similar_html += "</ul>"
+
             return f"""
             <h3>Summary:</h3>
             <p>{summary}</p>
 
             <h4>Impact Score: {impact_score}/100</h4>
+
+            {similar_html}
 
             <br><a href='/dashboard'>Back to Dashboard</a>
             """
