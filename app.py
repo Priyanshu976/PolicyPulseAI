@@ -5,8 +5,7 @@ import psycopg2
 import PyPDF2
 import re
 from collections import Counter
-from sklearn.feature_extraction.text import TfidfVectorizer
-from sklearn.metrics.pairwise import cosine_similarity
+import math
 
 STOPWORDS = {
     "the", "is", "in", "and", "to", "of", "for", "on", "with",
@@ -150,39 +149,40 @@ def calculate_impact_score(text):
 
     return min(score, 100)
 
-def find_similar_policies(new_summary, existing_policies):
-    """
-    existing_policies = list of tuples (title, summary)
-    """
 
+def cosine_similarity_manual(text1, text2):
+    words1 = re.findall(r'\w+', text1.lower())
+    words2 = re.findall(r'\w+', text2.lower())
+
+    freq1 = Counter(words1)
+    freq2 = Counter(words2)
+
+    all_words = set(freq1.keys()).union(set(freq2.keys()))
+
+    dot_product = sum(freq1.get(word, 0) * freq2.get(word, 0) for word in all_words)
+
+    magnitude1 = math.sqrt(sum(freq1.get(word, 0) ** 2 for word in all_words))
+    magnitude2 = math.sqrt(sum(freq2.get(word, 0) ** 2 for word in all_words))
+
+    if magnitude1 == 0 or magnitude2 == 0:
+        return 0
+
+    return dot_product / (magnitude1 * magnitude2)
+
+
+def find_similar_policies(new_summary, existing_policies):
     if not existing_policies:
         return []
 
-    titles = [policy[0] for policy in existing_policies]
-    summaries = [policy[1] for policy in existing_policies]
+    results = []
 
-    # Add new summary at the end
-    all_documents = summaries + [new_summary]
+    for title, summary in existing_policies:
+        similarity = cosine_similarity_manual(new_summary, summary)
+        results.append((title, round(similarity * 100, 2)))
 
-    vectorizer = TfidfVectorizer(stop_words="english")
-    tfidf_matrix = vectorizer.fit_transform(all_documents)
-
-    similarity_matrix = cosine_similarity(tfidf_matrix[-1], tfidf_matrix[:-1])
-
-    similarity_scores = similarity_matrix[0]
-
-    results = list(zip(titles, similarity_scores))
-
-    # Sort by similarity descending
     results = sorted(results, key=lambda x: x[1], reverse=True)
 
-    # Return top 2
-    top_matches = [
-        (title, round(score * 100, 2))
-        for title, score in results[:2]
-    ]
-
-    return top_matches
+    return results[:2]
 
 
 @app.route("/")
