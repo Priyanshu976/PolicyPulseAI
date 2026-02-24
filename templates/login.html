@@ -3,15 +3,30 @@
 <head>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
-<body style="display:flex;justify-content:center;align-items:center;height:100vh;background:linear-gradient(135deg,#0f172a,#1e293b);">
+<body class="login-body">
 
-<div class="card" style="width:340px;">
-    <h2>Login</h2>
-    <form method="POST">
-        <input type="email" name="email" placeholder="Email" required style="width:100%;margin-bottom:10px;padding:8px;">
-        <input type="password" name="password" placeholder="Password" required style="width:100%;margin-bottom:10px;padding:8px;">
-        <button type="submit" style="width:100%;">Login</button>
-    </form>
+<div class="login-container">
+
+    <div class="login-left">
+        <h2>Welcome Back</h2>
+        <p>Please enter your account details</p>
+
+        <form method="POST">
+            <input type="email" name="email" placeholder="Email" required>
+            <input type="password" name="password" placeholder="Password" required>
+            <button type="submit">Sign In</button>
+        </form>
+
+        <p style="margin-top:15px;">
+            Don't have an account? <a href="/register">Register</a>
+        </p>
+    </div>
+
+    <div class="login-right">
+        <h3>AI Insight</h3>
+        <p>{{ ai_message }}</p>
+    </div>
+
 </div>
 
 </body>

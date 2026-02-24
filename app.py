@@ -190,7 +190,7 @@ def find_similar_policies(new_summary, existing_policies):
 
 @app.route("/")
 def home():
-    return "Policy Pulse AI Clean Version Running!"
+    return render_template("landing.html")
 
 @app.route("/test-db")
 def test_db():
@@ -300,8 +300,22 @@ def login():
             return redirect("/dashboard")
 
         return "Invalid credentials."
+    try:
+        import google.generativeai as genai
+        genai.configure(api_key=os.getenv("GOOGLE_API_KEY"))
+        model = genai.GenerativeModel("gemini-2.5-flash")
 
-    return render_template("login.html")
+        prompt = """
+        Generate a short futuristic message about AI-powered policy analysis.
+        Keep it inspiring and under 3 sentences.
+        """
+
+        response = model.generate_content(prompt)
+        ai_message = response.text if response and response.text else "AI is transforming policy intelligence."
+    except:
+        ai_message = "AI is transforming policy intelligence."
+
+    return render_template("login.html", ai_message=ai_message)
 
 @app.route("/dashboard")
 def dashboard():

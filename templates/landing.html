@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body class="landing-body">
+
+<nav class="landing-nav">
+    <div class="brand">Policy Pulse AI</div>
+    <div>
+        <a href="/login" class="nav-btn">Login</a>
+        <a href="/register" class="nav-btn secondary">Register</a>
+    </div>
+</nav>
+
+<section class="hero">
+    <h1>AI-Powered Policy Intelligence Platform</h1>
+    <p>
+        Analyze government policies, measure impact, detect similarities,
+        and get intelligent recommendations — all powered by AI.
+    </p>
+    <div class="hero-buttons">
+        <a href="/login" class="primary-btn">Get Started</a>
+        <a href="#features" class="outline-btn">Learn More</a>
+    </div>
+</section>
+
+<section id="features" class="features">
+    <h2>What We Provide</h2>
+
+    <div class="feature-grid">
+        <div class="feature-card">
+            <h3>Smart Summarization</h3>
+            <p>Extract key insights from large policy PDFs instantly.</p>
+        </div>
+
+        <div class="feature-card">
+            <h3>Impact Scoring</h3>
+            <p>Evaluate development focus using AI-based scoring.</p>
+        </div>
+
+        <div class="feature-card">
+            <h3>Policy Similarity</h3>
+            <p>Detect related policies using vector similarity modeling.</p>
+        </div>
+
+        <div class="feature-card">
+            <h3>AI Scheme Advisor</h3>
+            <p>Get personalized government scheme recommendations.</p>
+        </div>
+    </div>
+</section>
+
+<section class="about">
+    <h2>Why Policy Pulse AI?</h2>
+    <p>
+        Built using Flask, PostgreSQL, and Gemini AI,
+        Policy Pulse AI bridges governance and intelligence
+        to empower decision-makers and citizens alike.
+    </p>
+</section>
+
+<footer class="landing-footer">
+    © 2026 Policy Pulse AI | Built with AI & Innovation
+</footer>
+
+</body>
+</html>
