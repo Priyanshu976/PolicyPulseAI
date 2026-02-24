@@ -270,17 +270,14 @@ def dashboard():
     conn = get_db_connection()
     cur = conn.cursor()
 
-    # Fetch user policies
     cur.execute(
         "SELECT title, summary, created_at, sentiment, keywords FROM policies WHERE user_id=%s ORDER BY created_at DESC",
         (session["user_id"],)
     )
     policies = cur.fetchall()
 
-    # Total policies
     total_policies = len(policies)
 
-    # Sentiment counts
     sentiment_counts = {
         "Development-Oriented": 0,
         "Welfare-Focused": 0,
@@ -300,7 +297,6 @@ def dashboard():
         if policy[4]:
             all_keywords.extend(policy[4].split(", "))
 
-    # Most common keywords
     keyword_freq = Counter(all_keywords)
     top_keywords = keyword_freq.most_common(5)
 
