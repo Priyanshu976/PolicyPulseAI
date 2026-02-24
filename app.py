@@ -28,8 +28,11 @@ if not DATABASE_URL:
 
 
 def get_db_connection():
-    conn = psycopg2.connect(DATABASE_URL)
-    return conn
+    return psycopg2.connect(
+        DATABASE_URL,
+        connect_timeout=5,
+        sslmode="require"
+    )
 
 def extract_text_from_pdf(file):
     reader = PyPDF2.PdfReader(file)
