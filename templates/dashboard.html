@@ -36,9 +36,11 @@
 
         <div class="card">
             <h3>Sentiment Distribution</h3>
-            <p>Positive: {{ sentiment_counts["Positive"] }}</p>
-            <p>Negative: {{ sentiment_counts["Negative"] }}</p>
-            <p>Neutral: {{ sentiment_counts["Neutral"] }}</p>
+
+            {% for category, count in sentiment_counts.items() %}
+                <p>{{ category }}: {{ count }}</p>
+            {% endfor %}
+
         </div>
 
         <div class="card">

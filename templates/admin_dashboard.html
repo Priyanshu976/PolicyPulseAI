@@ -33,9 +33,11 @@
 
 <h3>Sentiment Distribution</h3>
 <ul>
-    <li>Positive: {{ sentiment_counts["Positive"] }}</li>
-    <li>Negative: {{ sentiment_counts["Negative"] }}</li>
-    <li>Neutral: {{ sentiment_counts["Neutral"] }}</li>
+    {% for category, count in sentiment_counts.items() %}
+        <li>{{ category }}: {{ count }}</li>
+    {% else %}
+        <li>No sentiment data available.</li>
+    {% endfor %}
 </ul>
 
 <h3>Top Keywords</h3>
