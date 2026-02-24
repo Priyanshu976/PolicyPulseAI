@@ -282,19 +282,23 @@ def dashboard():
 
     # Sentiment counts
     sentiment_counts = {
-    "Development-Oriented": 0,
-    "Welfare-Focused": 0,
-    "Regulatory/Strict": 0,
-    "Critical/Risk": 0,
-    "Neutral": 0
+        "Development-Oriented": 0,
+        "Welfare-Focused": 0,
+        "Regulatory/Strict": 0,
+        "Critical/Risk": 0,
+        "Neutral": 0
     }
+
     all_keywords = []
 
-    raw_sentiment = policy[3]
-    if raw_sentiment and raw_sentiment in sentiment_counts:
+    for policy in policies:
+        raw_sentiment = policy[3]
+
+        if raw_sentiment and raw_sentiment in sentiment_counts:
             sentiment_counts[raw_sentiment] += 1
-    if policy[4]:
-        all_keywords.extend(policy[4].split(", "))
+
+        if policy[4]:
+            all_keywords.extend(policy[4].split(", "))
 
     # Most common keywords
     keyword_freq = Counter(all_keywords)
