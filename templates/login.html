@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
+    <title>Login - Policy Pulse AI</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 <body class="login-body">
@@ -9,7 +10,7 @@
 
     <div class="login-left">
         <h2>Welcome Back</h2>
-        <p>Please enter your account details</p>
+        <p>Access your AI-powered policy dashboard.</p>
 
         <form method="POST">
             <input type="email" name="email" placeholder="Email" required>
@@ -17,8 +18,9 @@
             <button type="submit">Sign In</button>
         </form>
 
-        <p style="margin-top:15px;">
-            Don't have an account? <a href="/register">Register</a>
+        <p style="margin-top:20px;">
+            Don’t have an account?
+            <a href="/register">Create one</a>
         </p>
     </div>
 
