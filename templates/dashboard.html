@@ -128,7 +128,7 @@ function togglePolicy(card) {
 
 /* Animated Counter */
 let count = document.getElementById("totalCount");
-let target = parseInt(count.innerText);
+let target = parseInt(count.innerText) || 0;
 let current = 0;
 
 let interval = setInterval(() => {
@@ -143,50 +143,72 @@ let interval = setInterval(() => {
 /* Live Time */
 function updateTime() {
     const now = new Date();
-    document.getElementById("liveTime").innerText =
-        now.toLocaleDateString() + " " + now.toLocaleTimeString();
+    const timeBox = document.getElementById("liveTime");
+    if(timeBox){
+        timeBox.innerText =
+            now.toLocaleDateString() + " " + now.toLocaleTimeString();
+    }
 }
 setInterval(updateTime, 1000);
 updateTime();
 
-/* Sentiment Chart */
-const ctx = document.getElementById('sentimentChart');
+/* SAFE Chart Rendering */
 
-new Chart(ctx, {
-    type: 'doughnut',
-    data: {
-        labels: {{ sentiment_counts.keys()|list|tojson }},
-        datasets: [{
-            data: {{ sentiment_counts.values()|list|tojson }},
-            backgroundColor: ['#0ea5e9','#f87171','#34d399','#fbbf24','#a78bfa']
-        }]
-    },
-    options: {
-        responsive: true,
-        maintainAspectRatio: false
+document.addEventListener("DOMContentLoaded", function() {
+
+    const sentimentLabels = {{ sentiment_counts.keys()|list|tojson|safe }};
+    const sentimentValues = {{ sentiment_counts.values()|list|tojson|safe }};
+
+    const ctx = document.getElementById('sentimentChart');
+
+    if (ctx) {
+        new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: sentimentLabels,
+                datasets: [{
+                    data: sentimentValues,
+                    backgroundColor: [
+                        '#0ea5e9',
+                        '#f87171',
+                        '#34d399',
+                        '#fbbf24',
+                        '#a78bfa'
+                    ]
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false
+            }
+        });
     }
-});
 
-/* Impact Trend Chart (lightweight dummy progression based on impact) */
-const impactCtx = document.getElementById('impactChart');
+    /* Second Chart (SAFE Static Version) */
 
-new Chart(impactCtx, {
-    type: 'line',
-    data: {
-        labels: {{ sentiment_counts.keys()|list|tojson }},
-        datasets: [{
-            label: "Impact Trend",
-            data: {{ sentiment_counts.values()|list|tojson }},
-            borderColor: "#0ea5e9",
-            backgroundColor: "rgba(14,165,233,0.1)",
-            fill: true,
-            tension: 0.4
-        }]
-    },
-    options: {
-        responsive: true,
-        maintainAspectRatio: false
+    const impactCtx = document.getElementById('impactChart');
+
+    if (impactCtx) {
+        new Chart(impactCtx, {
+            type: 'line',
+            data: {
+                labels: ["Q1", "Q2", "Q3", "Q4"],
+                datasets: [{
+                    label: "Impact Trend",
+                    data: [10, 25, 18, 32],
+                    borderColor: "#0ea5e9",
+                    backgroundColor: "rgba(14,165,233,0.1)",
+                    fill: true,
+                    tension: 0.4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false
+            }
+        });
     }
+
 });
 
 </script>
