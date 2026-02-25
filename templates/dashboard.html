@@ -23,15 +23,23 @@
 <!-- MAIN CONTENT -->
 <div class="main-content" id="mainContent">
 
-    <div class="dashboard-header">
-        <h1>AI Policy Dashboard</h1>
-        <div class="header-info">
-            {{ total_policies }} Policies Analyzed
+    <!-- PREMIUM TOP HEADER -->
+    <div class="top-header">
+        <div class="top-left">
+            <h1>AI Policy Dashboard</h1>
+        </div>
+
+        <div class="top-right">
+            <div id="liveTime" class="live-time"></div>
+            <div class="policy-count">
+                {{ total_policies }} Policies Analyzed
+            </div>
         </div>
     </div>
 
     <!-- METRICS -->
     <div class="metrics-grid">
+
         <div class="metric-card">
             <h3>Total Policies</h3>
             <div class="metric-value" id="totalCount">{{ total_policies }}</div>
@@ -52,18 +60,32 @@
                 {% endif %}
             </div>
         </div>
+
     </div>
 
-    <!-- CHART -->
-    <div class="chart-container">
-        <h3>Sentiment Distribution</h3>
-        <div class="chart-wrapper">
-            <canvas id="sentimentChart"></canvas>
+    <!-- CHART SECTION -->
+    <div class="charts-grid">
+
+        <!-- Sentiment Chart -->
+        <div class="chart-container">
+            <h3>Sentiment Distribution</h3>
+            <div class="chart-wrapper">
+                <canvas id="sentimentChart"></canvas>
+            </div>
         </div>
+
+        <!-- Impact Trend Chart -->
+        <div class="chart-container">
+            <h3>Impact Trend</h3>
+            <div class="chart-wrapper">
+                <canvas id="impactChart"></canvas>
+            </div>
+        </div>
+
     </div>
 
-    <!-- POLICIES -->
-    <h3 style="margin-bottom:20px;">Recent Policies</h3>
+    <!-- RECENT POLICIES -->
+    <h3 class="section-title">Recent Policies</h3>
 
     {% for policy in policies %}
         <div class="policy-card" onclick="togglePolicy(this)">
@@ -76,12 +98,16 @@
         </div>
     {% endfor %}
 
+    <!-- FOOTER -->
+    <div class="dashboard-footer">
+        © 2026 Policy Pulse AI · Built by Priyanshu Gajghate
+    </div>
+
 </div>
 
 <!-- FLOATING BUTTON -->
 <a href="/upload-policy" class="fab">+</a>
 
-<!-- JAVASCRIPT -->
 <script>
 
 /* Sidebar Collapse */
@@ -112,9 +138,18 @@ let interval = setInterval(() => {
         current++;
         count.innerText = current;
     }
-}, 30);
+}, 25);
 
-/* Chart */
+/* Live Time */
+function updateTime() {
+    const now = new Date();
+    document.getElementById("liveTime").innerText =
+        now.toLocaleDateString() + " " + now.toLocaleTimeString();
+}
+setInterval(updateTime, 1000);
+updateTime();
+
+/* Sentiment Chart */
 const ctx = document.getElementById('sentimentChart');
 
 new Chart(ctx, {
@@ -124,6 +159,28 @@ new Chart(ctx, {
         datasets: [{
             data: {{ sentiment_counts.values()|list|tojson }},
             backgroundColor: ['#0ea5e9','#f87171','#34d399','#fbbf24','#a78bfa']
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false
+    }
+});
+
+/* Impact Trend Chart (lightweight dummy progression based on impact) */
+const impactCtx = document.getElementById('impactChart');
+
+new Chart(impactCtx, {
+    type: 'line',
+    data: {
+        labels: {{ sentiment_counts.keys()|list|tojson }},
+        datasets: [{
+            label: "Impact Trend",
+            data: {{ sentiment_counts.values()|list|tojson }},
+            borderColor: "#0ea5e9",
+            backgroundColor: "rgba(14,165,233,0.1)",
+            fill: true,
+            tension: 0.4
         }]
     },
     options: {
