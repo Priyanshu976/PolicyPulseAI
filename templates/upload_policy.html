@@ -1,15 +1,61 @@
 <!DOCTYPE html>
 <html>
-<body>
-    <h2>Upload Policy PDF</h2>
+<head>
+    <title>Upload Policy - Policy Pulse AI</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
 
-    <form method="POST" enctype="multipart/form-data">
-        Title: <input type="text" name="title"><br><br>
-        Select PDF: <input type="file" name="pdf"><br><br>
-        <button type="submit">Upload & Summarize</button>
-    </form>
+<body class="dashboard-body">
 
-    <br>
-    <a href="/dashboard">Back to Dashboard</a>
+<div class="sidebar">
+    <h2>Policy Pulse</h2>
+
+    <a href="/dashboard">Dashboard</a>
+    <a href="/upload-policy" style="color:#38bdf8;">Upload Policy</a>
+    <a href="/scheme-advisor">Scheme Advisor</a>
+
+    {% if session.get("role") == "admin" %}
+        <a href="/admin">Admin Panel</a>
+    {% endif %}
+
+    <a href="/logout">Logout</a>
+</div>
+
+<div class="main-content">
+
+    <div class="top-header">
+        <h1>Policy Intelligence Engine</h1>
+    </div>
+
+    <div class="chart-container">
+
+        <h3>Upload Policy PDF</h3>
+
+        <form method="POST" enctype="multipart/form-data" id="uploadForm">
+
+            <label>Policy Title</label>
+            <input type="text" name="title" required class="form-input">
+
+            <label>Select PDF</label>
+            <input type="file" name="pdf" accept=".pdf" required class="form-input" id="pdfInput">
+
+            <div id="fileNameDisplay" style="margin-top:10px;color:#64748b;"></div>
+
+            <button type="submit" class="primary-btn">Upload & Analyze</button>
+
+        </form>
+
+    </div>
+
+</div>
+
+<script>
+document.getElementById("pdfInput").addEventListener("change", function(){
+    const fileName = this.files[0]?.name || "";
+    document.getElementById("fileNameDisplay").innerText =
+        fileName ? "Selected: " + fileName : "";
+});
+</script>
+
 </body>
 </html>

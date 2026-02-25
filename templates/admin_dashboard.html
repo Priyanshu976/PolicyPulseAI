@@ -1,56 +1,95 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Admin Dashboard</title>
+    <title>Admin Dashboard - Policy Pulse AI</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <script src="{{ url_for('static', filename='js/chart.js') }}"></script>
 </head>
-<body>
-    
-<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 
-<div class="navbar">
-    <div>
-        <a href="/dashboard">Policy Pulse AI</a>
-        <a href="/upload-policy">Upload Policy</a>
-        <a href="/scheme-advisor">Scheme Advisor</a>
+<body class="dashboard-body">
 
-        {% if session.get("role") == "admin" %}
-            <a href="/admin">Admin</a>
-        {% endif %}
-    </div>
-    <div>
-        <a href="/logout">Logout</a>
-    </div>
+<div class="sidebar">
+    <h2>Policy Pulse</h2>
+
+    <a href="/dashboard">Dashboard</a>
+    <a href="/upload-policy">Upload Policy</a>
+    <a href="/scheme-advisor">Scheme Advisor</a>
+    <a href="/admin" style="color:#38bdf8;">Admin Panel</a>
+    <a href="/logout">Logout</a>
 </div>
 
-<div class="container">
-<hr>
+<div class="main-content">
 
-<h2>Admin Dashboard</h2>
+    <div class="top-header">
+        <h1>System Control Center</h1>
+        <div class="policy-count">
+            Administrative Overview
+        </div>
+    </div>
 
-<h3>System Overview</h3>
-<p><strong>Total Users:</strong> {{ total_users }}</p>
-<p><strong>Total Policies:</strong> {{ total_policies }}</p>
+    <!-- METRICS -->
+    <div class="metrics-grid">
 
-<h3>Sentiment Distribution</h3>
-<ul>
-    {% for category, count in sentiment_counts.items() %}
-        <li>{{ category }}: {{ count }}</li>
-    {% else %}
-        <li>No sentiment data available.</li>
-    {% endfor %}
-</ul>
+        <div class="metric-card">
+            <h3>Total Users</h3>
+            <div class="metric-value">{{ total_users }}</div>
+        </div>
 
-<h3>Top Keywords</h3>
-<ul>
-    {% for word, count in top_keywords %}
-        <li>{{ word }} ({{ count }})</li>
-    {% else %}
-        <li>No data available.</li>
-    {% endfor %}
-</ul>
+        <div class="metric-card">
+            <h3>Total Policies</h3>
+            <div class="metric-value">{{ total_policies }}</div>
+        </div>
 
-<br>
-<a href="/dashboard">Back to User Dashboard</a>
+        <div class="metric-card">
+            <h3>Top Keyword</h3>
+            <div class="metric-value">
+                {% if top_keywords %}
+                    {{ top_keywords[0][0] }}
+                {% else %}
+                    -
+                {% endif %}
+            </div>
+        </div>
+
+    </div>
+
+    <!-- SENTIMENT CHART -->
+    <div class="chart-container">
+        <h3>Platform Sentiment Distribution</h3>
+        <div class="chart-wrapper">
+            <canvas id="adminSentimentChart"></canvas>
+        </div>
+    </div>
+
 </div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+
+    const labels = {{ sentiment_counts.keys()|list|tojson|safe }};
+    const values = {{ sentiment_counts.values()|list|tojson|safe }};
+
+    const ctx = document.getElementById("adminSentimentChart");
+
+    if(ctx){
+        new Chart(ctx, {
+            type: "bar",
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: "Policies",
+                    data: values,
+                    backgroundColor: "#0ea5e9"
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false
+            }
+        });
+    }
+});
+</script>
+
 </body>
 </html>

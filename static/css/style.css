@@ -340,6 +340,40 @@ body {
     font-size: 20px;
 }
 
+/*  */
+.form-input {
+    width: 100%;
+    padding: 12px;
+    margin: 10px 0 20px 0;
+    border-radius: 10px;
+    border: 1px solid #e2e8f0;
+    font-size: 14px;
+}
+
+.form-input:focus {
+    outline: none;
+    border-color: #0ea5e9;
+}
+
+.primary-btn {
+    background: #0ea5e9;
+    color: white;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.primary-btn:hover {
+    transform: translateY(-2px);
+}
+
+.form-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+}
 
 /* ================= DASHBOARD ================= */
 .dashboard-body {

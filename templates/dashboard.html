@@ -15,6 +15,11 @@
     <a href="/dashboard">Dashboard</a>
     <a href="/upload-policy">Upload Policy</a>
     <a href="/scheme-advisor">Scheme Advisor</a>
+
+    {% if session.get("role") == "admin" %}
+        <a href="/admin">Admin Panel</a>
+    {% endif %}
+    
     <a href="/logout">Logout</a>
 
     <button class="collapse-btn" onclick="toggleSidebar()">☰</button>

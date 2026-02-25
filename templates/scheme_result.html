@@ -2,38 +2,43 @@
 <html>
 <head>
     <title>Scheme Recommendations</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
-<body>
-<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 
-<div class="navbar">
-    <div>
-        <a href="/dashboard">Policy Pulse AI</a>
-        <a href="/upload-policy">Upload Policy</a>
-        <a href="/scheme-advisor">Scheme Advisor</a>
+<body class="dashboard-body">
 
-        {% if session.get("role") == "admin" %}
-            <a href="/admin">Admin</a>
-        {% endif %}
-    </div>
-    <div>
-        <a href="/logout">Logout</a>
-    </div>
+<div class="sidebar">
+    <h2>Policy Pulse</h2>
+
+    <a href="/dashboard">Dashboard</a>
+    <a href="/upload-policy">Upload Policy</a>
+    <a href="/scheme-advisor" style="color:#38bdf8;">Scheme Advisor</a>
+
+    {% if session.get("role") == "admin" %}
+        <a href="/admin">Admin Panel</a>
+    {% endif %}
+
+    <a href="/logout">Logout</a>
 </div>
 
-<div class="container">
+<div class="main-content">
 
-<div class="card">
-    <h3>Recommended Government Schemes</h3>
-    <div style="white-space: pre-wrap;">
-        {{ advice }}
+    <div class="top-header">
+        <h1>AI Recommendations</h1>
     </div>
+
+    <div class="chart-container">
+
+        <div style="white-space: pre-wrap; line-height:1.6;">
+            {{ advice }}
+        </div>
+
+        <br>
+        <a href="/scheme-advisor" class="primary-btn">Search Again</a>
+
+    </div>
+
 </div>
 
-<br>
-<a href="/scheme-advisor">Search Again</a><br>
-<a href="/dashboard">Back to Dashboard</a>
-
-</div>
 </body>
 </html>

@@ -2,71 +2,76 @@
 <html>
 <head>
     <title>AI Government Scheme Advisor</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
-<body>
 
-<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+<body class="dashboard-body">
 
-<div class="navbar">
-    <div>
-        <a href="/dashboard">Policy Pulse AI</a>
-        <a href="/upload-policy">Upload Policy</a>
-        <a href="/scheme-advisor">Scheme Advisor</a>
+<div class="sidebar">
+    <h2>Policy Pulse</h2>
 
-        {% if session.get("role") == "admin" %}
-            <a href="/admin">Admin</a>
-        {% endif %}
-    </div>
-    <div>
-        <a href="/logout">Logout</a>
-    </div>
+    <a href="/dashboard">Dashboard</a>
+    <a href="/upload-policy">Upload Policy</a>
+    <a href="/scheme-advisor" style="color:#38bdf8;">Scheme Advisor</a>
+
+    {% if session.get("role") == "admin" %}
+        <a href="/admin">Admin Panel</a>
+    {% endif %}
+
+    <a href="/logout">Logout</a>
 </div>
 
-<div class="container">
+<div class="main-content">
 
-<h2>AI Government Scheme Advisor</h2>
+    <div class="top-header">
+        <h1>AI Government Scheme Advisor</h1>
+    </div>
 
-<form method="POST">
-    Age: <input type="number" name="age"><br><br>
+    <div class="chart-container">
 
-    Gender:
-    <select name="gender">
-        <option>Male</option>
-        <option>Female</option>
-        <option>Other</option>
-    </select><br><br>
+        <form method="POST" class="advisor-form">
 
-    Monthly Income: <input type="text" name="income"><br><br>
+            <div class="form-grid">
 
-    Occupation:
-    <select name="occupation">
-        <option>Student</option>
-        <option>Farmer</option>
-        <option>Business Owner</option>
-        <option>Job Seeker</option>
-        <option>Government Employee</option>
-        <option>Private Employee</option>
-        <option>Homemaker</option>
-        <option>Other</option>
-    </select><br><br>
+                <input type="number" name="age" placeholder="Age" required class="form-input">
 
-    State: <input type="text" name="state"><br><br>
+                <select name="gender" class="form-input">
+                    <option>Male</option>
+                    <option>Female</option>
+                    <option>Other</option>
+                </select>
 
-    Area Type:
-    <select name="area_type">
-        <option>Rural</option>
-        <option>Urban</option>
-    </select><br><br>
+                <input type="text" name="income" placeholder="Monthly Income" required class="form-input">
 
-    What support do you need?<br>
-    <textarea name="need"></textarea><br><br>
+                <select name="occupation" class="form-input">
+                    <option>Student</option>
+                    <option>Farmer</option>
+                    <option>Business Owner</option>
+                    <option>Job Seeker</option>
+                    <option>Government Employee</option>
+                    <option>Private Employee</option>
+                    <option>Homemaker</option>
+                    <option>Other</option>
+                </select>
 
-    <button type="submit">Find Suitable Schemes</button>
-</form>
+                <input type="text" name="state" placeholder="State" required class="form-input">
 
-<br>
-<a href="/dashboard">Back to Dashboard</a>
+                <select name="area_type" class="form-input">
+                    <option>Rural</option>
+                    <option>Urban</option>
+                </select>
+
+            </div>
+
+            <textarea name="need" placeholder="Describe the support you are looking for..." class="form-input" style="height:120px;"></textarea>
+
+            <button type="submit" class="primary-btn">Generate AI Recommendations</button>
+
+        </form>
+
+    </div>
 
 </div>
+
 </body>
 </html>
