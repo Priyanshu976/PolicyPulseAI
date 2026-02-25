@@ -339,3 +339,116 @@ body {
     text-decoration: none;
     font-size: 20px;
 }
+
+
+/* ================= DASHBOARD ================= */
+
+.dashboard-body {
+    margin: 0;
+    font-family: 'Inter', sans-serif;
+    background: #0f172a;
+    color: #e2e8f0;
+    display: flex;
+}
+
+/* Sidebar */
+
+.sidebar {
+    width: 250px;
+    background: #020617;
+    height: 100vh;
+    padding: 30px 20px;
+    position: fixed;
+}
+
+.sidebar h2 {
+    color: #38bdf8;
+    margin-bottom: 40px;
+}
+
+.sidebar a {
+    display: block;
+    color: #94a3b8;
+    text-decoration: none;
+    margin: 18px 0;
+    font-weight: 500;
+}
+
+.sidebar a:hover {
+    color: #38bdf8;
+}
+
+/* Main content */
+
+.main-content {
+    margin-left: 250px;
+    padding: 40px;
+    width: 100%;
+}
+
+/* Header */
+
+.dashboard-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 40px;
+}
+
+.dashboard-header h1 {
+    font-size: 28px;
+}
+
+.header-info {
+    color: #94a3b8;
+}
+
+/* Metrics */
+
+.metrics-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 25px;
+    margin-bottom: 40px;
+}
+
+.metric-card {
+    background: #1e293b;
+    padding: 25px;
+    border-radius: 14px;
+    border-left: 4px solid #38bdf8;
+}
+
+.metric-card h3 {
+    font-size: 14px;
+    color: #94a3b8;
+}
+
+.metric-value {
+    font-size: 32px;
+    font-weight: bold;
+    margin-top: 10px;
+}
+
+/* Chart section */
+
+.chart-container {
+    background: #1e293b;
+    padding: 30px;
+    border-radius: 14px;
+    margin-bottom: 40px;
+}
+
+/* Policy list */
+
+.policy-card {
+    background: #1e293b;
+    padding: 20px;
+    border-radius: 14px;
+    margin-bottom: 20px;
+}
+
+.policy-card h4 {
+    margin-bottom: 10px;
+    color: #38bdf8;
+}

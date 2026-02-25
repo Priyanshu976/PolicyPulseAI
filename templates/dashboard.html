@@ -1,56 +1,100 @@
-{% extends "base.html" %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Dashboard - Policy Pulse AI</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <script src="{{ url_for('static', filename='js/chart.js') }}"></script>
+</head>
+<body class="dashboard-body">
 
-{% block content %}
-
-<h1>Dashboard Overview</h1>
-
-<div class="card" style="margin-bottom:40px;">
-    <h1 style="font-size:32px;">Welcome to Policy Pulse AI 🚀</h1>
-    <p style="color:#94a3b8;">
-        AI-powered policy intelligence, impact analytics, and semantic similarity insights.
-    </p>
+<div class="sidebar">
+    <h2>Policy Pulse</h2>
+    <a href="/dashboard">Dashboard</a>
+    <a href="/upload-policy">Upload Policy</a>
+    <a href="/scheme-advisor">Scheme Advisor</a>
+    <a href="/logout">Logout</a>
 </div>
 
-<div class="analytics-grid">
+<div class="main-content">
 
-    <div class="card">
-        <h3>Total Policies</h3>
-        <div class="big-number">{{ total_policies }}</div>
+    <div class="dashboard-header">
+        <h1>AI Policy Dashboard</h1>
+        <div class="header-info">
+            {{ total_policies }} Policies Analyzed
+        </div>
     </div>
 
-    <div class="card">
-        <h3>Average Impact Score</h3>
-        <div class="big-number">{{ average_impact }}/100</div>
+    <!-- Metrics -->
+    <div class="metrics-grid">
+        <div class="metric-card">
+            <h3>Total Policies</h3>
+            <div class="metric-value" id="totalCount">{{ total_policies }}</div>
+        </div>
+
+        <div class="metric-card">
+            <h3>Average Impact</h3>
+            <div class="metric-value">{{ average_impact }}/100</div>
+        </div>
+
+        <div class="metric-card">
+            <h3>Top Keyword</h3>
+            <div class="metric-value">
+                {% if top_keywords %}
+                    {{ top_keywords[0][0] }}
+                {% else %}
+                    -
+                {% endif %}
+            </div>
+        </div>
     </div>
 
-</div>
+    <!-- Chart -->
+    <div class="chart-container">
+        <h3>Sentiment Distribution</h3>
+        <canvas id="sentimentChart"></canvas>
+    </div>
+    <script>
+    let count = document.getElementById("totalCount");
+    let target = parseInt(count.innerText);
+    let current = 0;
 
-<div class="card">
-    <h3>Sentiment Distribution</h3>
-    <canvas id="sentimentChart"></canvas>
-</div>
+    let interval = setInterval(() => {
+        if(current >= target){
+            clearInterval(interval);
+        } else {
+            current++;
+            count.innerText = current;
+        }
+    }, 50);
+    </script>
 
-<div class="card">
-    <h3>Top Keywords</h3>
-    <ul>
-        {% for word, count in top_keywords %}
-            <li>{{ word }} ({{ count }})</li>
-        {% endfor %}
-    </ul>
+    <!-- Policies -->
+    <h3>Recent Policies</h3>
+
+    {% for policy in policies %}
+        <div class="policy-card">
+            <h4>{{ policy[0] }}</h4>
+            <p>{{ policy[1][:200] }}...</p>
+            <small>Sentiment: {{ policy[3] }}</small>
+        </div>
+    {% endfor %}
+
 </div>
 
 <script>
-    const ctx = document.getElementById('sentimentChart');
+const ctx = document.getElementById('sentimentChart');
 
-    new Chart(ctx, {
-        type: 'pie',
-        data: {
-            labels: {{ sentiment_counts.keys()|list|tojson }},
-            datasets: [{
-                data: {{ sentiment_counts.values()|list|tojson }},
-            }]
-        }
-    });
+new Chart(ctx, {
+    type: 'doughnut',
+    data: {
+        labels: {{ sentiment_counts.keys()|list|tojson }},
+        datasets: [{
+            data: {{ sentiment_counts.values()|list|tojson }},
+            backgroundColor: ['#38bdf8','#f87171','#34d399','#fbbf24','#a78bfa']
+        }]
+    }
+});
 </script>
 
-{% endblock %}
+</body>
+</html>
