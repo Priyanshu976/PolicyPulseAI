@@ -6,6 +6,7 @@ import PyPDF2
 import re
 from collections import Counter
 import math
+import random
 
 STOPWORDS = {
     "the", "is", "in", "and", "to", "of", "for", "on", "with",
@@ -300,20 +301,26 @@ def login():
             return redirect("/dashboard")
 
         return "Invalid credentials."
-    try:
-        import google.generativeai as genai
-        genai.configure(api_key=os.getenv("GOOGLE_API_KEY"))
-        model = genai.GenerativeModel("gemini-2.5-flash")
+    
+    quotes = [
+        "AI now illuminates policy's intricate pathways, revealing optimal futures with unprecedented clarity. Decisions, once debated, are now informed by foresight, creating a world of flourishing possibility. Welcome to governance, intelligently evolved.",
+        "AI-driven insights now illuminate every policy pathway, ensuring decisions are not just responsive, but proactively optimized for global well-being. We forge futures with unprecedented foresight, building societies of equity and flourishing possibility.",
+        "From vast data, AI now extracts the wisdom to forge a better world. Policies crafted with unparalleled foresight build truly resilient and equitable societies. Welcome to the era of enlightened governance, where humanity's future is intelligently designed.",
+        "AI no longer just analyzes data; it anticipates needs and envisions optimal futures. Our intelligent systems now co-create policies, ensuring every decision is deeply informed, equitable, and propels humanity into an era of unprecedented progress.",
+        "AI's predictive insights now illuminate pathways to a better future, transforming complex data into clear, actionable governance strategies. Imagine policy forged with foresight, anticipating needs and fostering resilience across every community. This is the dawn of truly intelligent, adaptive decision-making for all.",
+        "Predictive AI now empowers policymakers to foresee impact and craft solutions with unparalleled precision. Through its lens, we illuminate optimal paths to a more just and sustainable future for all. This is not just analysis; it's the dawn of intelligent governance.",
+        "The future of governance is here. AI-driven policy analysis now illuminates complex pathways, anticipating impact to craft solutions that elevate all of humanity.",
+        "AI now illuminates the complex pathways of policy, optimizing for societal well-being with unprecedented foresight. This era of data-driven governance empowers leaders to build truly equitable and sustainable futures for all.",
+        "Our AI policy engines now synthesize planetary data, revealing pathways to a truly optimized future. Complex challenges yield to intelligent design, crafting a more just and sustainable world for all.",
+        "Neural networks now illuminate complex societal challenges, guiding policymakers to unprecedented solutions. AI-driven insights empower us to craft truly optimal decisions, ensuring a future of prosperity and well-being for all. Welcome to the era of intelligent governance.",
+        "Neural networks now illuminate policy pathways with unprecedented clarity, modeling futures with stunning precision. This allows us to craft proactive policies that ensure optimal societal impact and accelerate progress for all. Welcome to an era of truly intelligent, human-centric governance.",
+        "Policy awareness strengthens democratic participation.",
+        "When analysis meets innovation, governance evolves.",
+        "From documents to decisions — powered by intelligence.",
+        "Clarity in policy creates confidence in progress."
+    ]
 
-        prompt = """
-        Generate a short futuristic message about AI-powered policy analysis.
-        Keep it inspiring and under 3 sentences.
-        """
-
-        response = model.generate_content(prompt)
-        ai_message = response.text if response and response.text else "AI is transforming policy intelligence."
-    except:
-        ai_message = "AI is transforming policy intelligence."
+    ai_message = random.choice(quotes)
 
     return render_template("login.html", ai_message=ai_message)
 
