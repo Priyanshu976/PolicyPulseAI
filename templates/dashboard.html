@@ -5,17 +5,23 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     <script src="{{ url_for('static', filename='js/chart.js') }}"></script>
 </head>
+
 <body class="dashboard-body">
 
-<div class="sidebar">
+<!-- SIDEBAR -->
+<div class="sidebar" id="sidebar">
     <h2>Policy Pulse</h2>
+
     <a href="/dashboard">Dashboard</a>
     <a href="/upload-policy">Upload Policy</a>
     <a href="/scheme-advisor">Scheme Advisor</a>
     <a href="/logout">Logout</a>
+
+    <button class="collapse-btn" onclick="toggleSidebar()">☰</button>
 </div>
 
-<div class="main-content">
+<!-- MAIN CONTENT -->
+<div class="main-content" id="mainContent">
 
     <div class="dashboard-header">
         <h1>AI Policy Dashboard</h1>
@@ -24,7 +30,7 @@
         </div>
     </div>
 
-    <!-- Metrics -->
+    <!-- METRICS -->
     <div class="metrics-grid">
         <div class="metric-card">
             <h3>Total Policies</h3>
@@ -48,40 +54,67 @@
         </div>
     </div>
 
-    <!-- Chart -->
+    <!-- CHART -->
     <div class="chart-container">
         <h3>Sentiment Distribution</h3>
-        <canvas id="sentimentChart"></canvas>
+        <div class="chart-wrapper">
+            <canvas id="sentimentChart"></canvas>
+        </div>
     </div>
-    <script>
-    let count = document.getElementById("totalCount");
-    let target = parseInt(count.innerText);
-    let current = 0;
 
-    let interval = setInterval(() => {
-        if(current >= target){
-            clearInterval(interval);
-        } else {
-            current++;
-            count.innerText = current;
-        }
-    }, 50);
-    </script>
-
-    <!-- Policies -->
-    <h3>Recent Policies</h3>
+    <!-- POLICIES -->
+    <h3 style="margin-bottom:20px;">Recent Policies</h3>
 
     {% for policy in policies %}
-        <div class="policy-card">
+        <div class="policy-card" onclick="togglePolicy(this)">
             <h4>{{ policy[0] }}</h4>
-            <p>{{ policy[1][:200] }}...</p>
-            <small>Sentiment: {{ policy[3] }}</small>
+
+            <div class="policy-content">
+                <p>{{ policy[1] }}</p>
+                <small>Sentiment: {{ policy[3] }}</small>
+            </div>
         </div>
     {% endfor %}
 
 </div>
 
+<!-- FLOATING BUTTON -->
+<a href="/upload-policy" class="fab">+</a>
+
+<!-- JAVASCRIPT -->
 <script>
+
+/* Sidebar Collapse */
+function toggleSidebar() {
+    const sidebar = document.getElementById("sidebar");
+    const main = document.getElementById("mainContent");
+
+    sidebar.classList.toggle("collapsed");
+    main.classList.toggle("expanded");
+}
+
+/* Expand Policy Card */
+function togglePolicy(card) {
+    const content = card.querySelector('.policy-content');
+    content.style.display =
+        content.style.display === "block" ? "none" : "block";
+}
+
+/* Animated Counter */
+let count = document.getElementById("totalCount");
+let target = parseInt(count.innerText);
+let current = 0;
+
+let interval = setInterval(() => {
+    if(current >= target){
+        clearInterval(interval);
+    } else {
+        current++;
+        count.innerText = current;
+    }
+}, 30);
+
+/* Chart */
 const ctx = document.getElementById('sentimentChart');
 
 new Chart(ctx, {
@@ -90,10 +123,15 @@ new Chart(ctx, {
         labels: {{ sentiment_counts.keys()|list|tojson }},
         datasets: [{
             data: {{ sentiment_counts.values()|list|tojson }},
-            backgroundColor: ['#38bdf8','#f87171','#34d399','#fbbf24','#a78bfa']
+            backgroundColor: ['#0ea5e9','#f87171','#34d399','#fbbf24','#a78bfa']
         }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false
     }
 });
+
 </script>
 
 </body>
