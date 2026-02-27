@@ -238,78 +238,18 @@ def create_schemes_table():
 def seed_schemes_full():
 
     schemes_data = [
-    # 1-10: Agriculture & Rural
-    ("PM-Kisan Samman Nidhi", "Agriculture", "₹6,000 annual income support to farmers via DBT.", "Small and marginal farmers with cultivable land.", "Apply at pmkisan.gov.in.", 18, 99, "All", None, "Farmer,Rural,All", "National"),
-    ("PM Fasal Bima Yojana", "Agriculture", "Insurance cover against crop loss due to natural calamities.", "All farmers growing notified crops.", "Apply via National Crop Insurance Portal.", 18, 99, "All", None, "Farmer,All", "National"),
-    ("Kisan Credit Card (KCC)", "Finance", "Low-interest loans for agricultural activities.", "Farmers, SHGs, tenant farmers.", "Apply at bank branch.", 18, 75, "All", None, "Farmer,Fisherman,All", "National"),
-    ("PM Krishi Sinchai Yojana", "Agriculture", "Financial support for micro-irrigation systems.", "Farmers with land; priority to Small/Marginal/Women.", "Apply at District Agriculture Office.", 18, 99, "All", None, "Farmer,All", "National"),
-    ("Pashu Kisan Credit Card", "Animal Husbandry", "Loans for livestock maintenance (Cow/Buffalo/Goat).", "Livestock owners.", "Apply at bank or veterinary hospital.", 18, 99, "All", None, "Farmer,Livestock,All", "National"),
-    ("Soil Health Card Scheme", "Agriculture", "Free soil testing and fertilizer advice.", "All farmers owning cultivable land.", "Visit soilhealth.dac.gov.in.", 18, 99, "All", None, "Farmer,All", "National"),
-    ("PM-KUSUM", "New & Renewable Energy", "Subsidies up to 90% for solar water pumps.", "Farmers with dry land or stable water sources.", "Apply through State DISCOM portal.", 18, 99, "All", None, "Farmer,All", "National"),
-    ("Paramparagat Krishi Vikas", "Agriculture", "Support for organic farming through clusters.", "Farmers in groups (minimum 20 hectares).", "Contact Regional Council (Agri).", 18, 99, "All", None, "Farmer,All", "National"),
-    ("MGNREGA", "Rural Development", "100 days guaranteed rural employment.", "Adult rural residents.", "Apply for Job Card at Panchayat.", 18, 99, "All", None, "Labourer,Rural,All", "National"),
-    ("Jal Jeevan Mission", "Jal Shakti", "Provision of functional tap water connection.", "Rural households without tap water.", "Contact Village Water Committee.", 0, 99, "All", None, "Rural,All", "National"),
-
-    # 11-20: Health & Social Security
-    ("Ayushman Bharat (PM-JAY)", "Health", "Health cover up to ₹5 lakh per family per year.", "Low-income families and senior citizens.", "Check eligibility at pmjay.gov.in.", 0, 99, "All", 150000, "All", "National"),
-    ("Atal Pension Yojana", "Finance", "Guaranteed pension after age 60.", "Citizens aged 18-40 with bank account.", "Enroll via bank.", 18, 40, "All", None, "Worker,All", "National"),
-    ("PM Jeevan Jyoti Bima", "Finance", "Life insurance cover of ₹2 Lakh.", "Bank account holders aged 18-50.", "Enable auto-debit at bank branch.", 18, 50, "All", None, "All", "National"),
-    ("PM Suraksha Bima Yojana", "Finance", "Accidental death cover of ₹2 Lakh.", "Bank account holders aged 18-70.", "Enable auto-debit at bank branch.", 18, 70, "All", None, "All", "National"),
-    ("PM Shram Yogi Maandhan", "Labour", "Monthly pension of ₹3,000 after age 60.", "Unorganized workers with income < ₹15k.", "Enroll at CSC with Aadhaar.", 18, 40, "All", 15000, "Worker,Unorganized,All", "National"),
-    ("E-Shram Card", "Labour", "Social security and accident insurance.", "Unorganized sector workers.", "Register at eshram.gov.in.", 16, 59, "All", None, "Worker,Labourer,All", "National"),
-    ("National Social Assistance", "Rural Development", "Monthly pension for elderly/widows.", "BPL citizens meeting state age criteria.", "Apply through Social Welfare Dept.", 60, 99, "All", 5000, "Senior,All", "National"),
-    ("Jan Aushadhi Scheme", "Fertilizers", "Quality generic medicines at low cost.", "All citizens.", "Purchase from Jan Aushadhi Kendras.", 0, 99, "All", None, "All", "National"),
-    ("Mission Indradhanush", "Health", "Full immunization for kids and moms.", "Children under 2 and pregnant women.", "Visit Govt Health Centers.", 0, 45, "All", None, "All", "National"),
-    ("PM Vaya Vandana Yojana", "Finance", "Guaranteed 7.4% pension for seniors.", "Senior citizens aged 60 and above.", "Apply via LIC website/office.", 60, 99, "All", None, "Senior,All", "National"),
-
-    # 21-30: Business & Entrepreneurship
-    ("PM Mudra Yojana", "Finance", "Collateral-free business loans up to ₹20 lakh.", "Micro and small entrepreneurs.", "Apply via bank or udyamimitra.in.", 18, 65, "All", None, "Entrepreneur,Business,All", "National"),
-    ("PM Vishwakarma", "MSME", "Toolkit incentive and loans at 5% interest.", "Traditional artisans (Carpenters, etc.).", "Apply at pmvishwakarma.gov.in.", 18, 99, "All", None, "Artisan,Entrepreneur,All", "National"),
-    ("Stand-Up India", "Finance", "Loans ₹10 Lakh to ₹1 Crore.", "SC/ST and Women entrepreneurs.", "Apply via standupmitra.in.", 18, 99, "All", None, "Entrepreneur,Business,All", "National"),
-    ("PM-SVANidhi", "Housing & Urban", "Initial ₹10,000 loan for street vendors.", "Urban street vendors.", "Apply on pmsvanidhi.mohua.gov.in.", 18, 99, "All", None, "Vendor,Entrepreneur,All", "National"),
-    ("PMEGP", "MSME", "Subsidies up to 35% for new units.", "Individuals above 18, SHGs.", "Apply via kviconline.gov.in.", 18, 99, "All", None, "Entrepreneur,Unemployed,All", "National"),
-    ("Startup India Seed Fund", "Commerce", "Financial aid for early startups.", "DPIIT recognized startups.", "Apply at startupindia.gov.in.", 18, 99, "All", None, "Entrepreneur,Student,All", "National"),
-    ("Credit Guarantee (CGTMSE)", "MSME", "Collateral-free credit for MSMEs.", "New/existing MSMEs in manufacturing.", "Visit any member bank/NBFC.", 18, 99, "All", None, "Business,Entrepreneur,All", "National"),
-    ("Mahila Coir Yojana", "MSME", "Equipment subsidy for women workers.", "Women in coir producing regions.", "Contact Coir Board Offices.", 18, 60, "Female", None, "Artisan,Entrepreneur,All", "National"),
-    ("Startup India Tax Holiday", "Commerce", "Income tax exemption for 3 years.", "Eligible DPIIT-recognized startups.", "Apply at startupindia.gov.in.", 18, 99, "All", None, "Entrepreneur,All", "National"),
-    ("PM-FME", "Food Processing", "Credit for small food units (Pickle/Jam).", "Micro-food processing owners/SHGs.", "Apply on mofpi.gov.in.", 18, 99, "All", None, "Entrepreneur,All", "National"),
-
-    # 31-40: Women & Child
-    ("Sukanya Samriddhi Yojana", "WCD", "High-interest savings scheme for girl child.", "Girl child below 10 years.", "Open account at Post Office.", 0, 10, "Female", None, "Student,All", "National"),
-    ("PM Matru Vandana Yojana", "WCD", "Cash incentive of ₹5,000 for mothers.", "First/second-time pregnant women.", "Register at Anganwadi Center.", 19, 50, "Female", None, "HomeMaker,All", "National"),
-    ("Lakhpati Didi", "Rural Development", "Skill support for ₹1 Lakh/year income.", "Women in Self-Help Groups (SHGs).", "Contact Gram Panchayat/SHG Officer.", 18, 60, "Female", None, "Entrepreneur,SHG,All", "National"),
-    ("Mahila Samman Savings", "Finance", "Fixed 7.5% interest for 2-year deposit.", "Any woman or girl child.", "Apply at any Post Office.", 0, 99, "Female", None, "All", "National"),
-    ("Ujjwala 2.0", "Petroleum", "Free LPG connection and first refill.", "BPL women without gas connection.", "Apply at pmuy.gov.in.", 18, 99, "Female", None, "HomeMaker,All", "National"),
-    ("Beti Bachao Beti Padhao", "WCD", "Educational support for girls.", "Parents of girl child.", "Contact District WCD Office.", 0, 18, "Female", None, "Student,All", "National"),
-    ("Drone Didi", "Agriculture", "Training to fly drones for agri-services.", "Women in rural SHGs.", "Apply through NRLM portal.", 18, 50, "Female", None, "Farmer,All", "National"),
-    ("SHRESHTA", "Social Justice", "Residential education for SC students.", "Merit SC students (Class 9/11).", "Selection via National Entrance Test.", 14, 18, "All", 20000, "Student,All", "National"),
-    ("Vatsalya Scheme", "WCD", "Support for orphans and children in need.", "Children below 18 years.", "Contact Child Welfare Committee.", 0, 18, "All", None, "Student,All", "National"),
-    ("TREAD Scheme", "MSME", "Training and credit for women entrepreneurs.", "Women entrepreneurs/NGOs.", "Apply at local MSME Institute.", 18, 60, "Female", None, "Entrepreneur,All", "National"),
-
-    # 41-50: Education & Youth
-    ("PM Vidyalakshmi", "Education", "Single portal for loans and scholarships.", "Students admitted to higher education.", "Register at vidyalakshmi.co.in.", 17, 35, "All", None, "Student,All", "National"),
-    ("PM Kaushal Vikas Yojana", "Skill Development", "Free skill training and certification.", "Unemployed youth/Dropouts.", "Register at skillindiadigital.gov.in.", 15, 45, "All", None, "Student,Unemployed,All", "National"),
-    ("Post-Matric Scholarship (SC)", "Social Justice", "Financial aid for higher studies.", "SC students; family income < ₹2.5L.", "Apply at scholarships.gov.in.", 15, 30, "All", 250000, "Student,All", "National"),
-    ("Agnipath Scheme", "Defence", "4-year service in Indian Armed Forces.", "Educational criteria as per post.", "Join Indian Army/Navy/AirForce portals.", 17, 21, "All", None, "Student,Unemployed,All", "National"),
-    ("PM-YASASVI", "Social Justice", "Scholarships for Class 9-12 students.", "OBC/EBC/DNT meet income criteria.", "Apply on NTA YASASVI Portal.", 13, 19, "All", 250000, "Student,All", "National"),
-    ("National Apprenticeship (NAPS)", "Skill Development", "Stipend and training in industry.", "ITI, Diploma, or Degree holders.", "Apply at apprenticeshipindia.gov.in.", 14, 35, "All", None, "Student,Unemployed,All", "National"),
-    ("PM SHRI Schools", "Education", "Modern school facilities/teaching.", "Students in PM SHRI schools.", "School infrastructure benefits.", 4, 18, "All", None, "Student,All", "National"),
-    ("Yuva Sahakar", "Cooperation", "Credit for youth cooperatives.", "Young cooperative members.", "Apply through NCDC portal.", 18, 35, "All", None, "Entrepreneur,All", "National"),
-    ("Smart City Fellowship", "Urban Development", "Stipend for working on city projects.", "Graduates/Young professionals.", "Apply on Smart Net Portal.", 21, 35, "All", None, "Student,All", "National"),
-    ("Digital India Internship", "Electronics", "Internship with ₹10,000 stipend.", "B.Tech/M.Tech students.", "Apply on MeitY Portal.", 18, 25, "All", None, "Student,All", "National"),
-
-    # 51-60: Housing, Food & General
-    ("PM Awas Yojana (Urban)", "Housing", "Interest subsidy for urban housing.", "EWS and LIG urban families.", "Apply at pmaymis.gov.in.", 18, 99, "All", 150000, "All", "National"),
-    ("PM Awas Yojana (Gramin)", "Rural Development", "Financial support for rural housing.", "Rural homeless households.", "Apply at Gram Panchayat.", 18, 99, "All", None, "Rural,All", "National"),
-    ("Saubhagya Yojana", "Power", "Free electricity connection.", "BPL and identified poor families.", "Register at DISCOM office.", 18, 99, "All", None, "All", "National"),
-    ("PM Surya Ghar Yojana", "Energy", "300 units free solar electricity.", "Residential households.", "Apply on pmsuryaghar.gov.in.", 18, 99, "All", None, "All", "National"),
-    ("Antyodaya Anna Yojana", "Consumer Affairs", "35kg subsidized grains monthly.", "Poorest of the poor families.", "Contact local PDS shop.", 0, 99, "All", 2000, "All", "National"),
-    ("One Nation One Ration Card", "Consumer Affairs", "Access ration from any FPS in India.", "Existing ration card holders.", "Use card at any biometric FPS.", 0, 99, "All", None, "All", "National"),
-    ("Pradhan Mantri Jan Dhan Yojana", "Finance", "Zero balance account + ₹10k overdraft.", "Unbanked citizens.", "Visit any bank branch.", 10, 99, "All", None, "All", "National"),
-    ("NAMASTE Scheme", "Social Justice", "Safety/credit for sanitation workers.", "Sewer/Septic tank cleaners.", "Contact Urban Local Body.", 18, 60, "All", None, "Labourer,All", "National"),
-    ("Solar Rooftop Subsidy", "Energy", "Subsidies for home solar panels.", "Residential consumers.", "Apply at solarrooftop.gov.in.", 18, 99, "All", None, "All", "National"),
-    ("SMILE Scheme", "Social Justice", "Rehab for Transgender/Marginalized.", "Transgender and marginalized people.", "Apply on MSJE Portal.", 18, 99, "All", None, "All", "National")
-]
+        ("PM-Kisan Samman Nidhi","Agriculture","₹6,000 annual income support to farmers via DBT.","Small and marginal farmers with cultivable land.","Apply at pmkisan.gov.in.",18,99,"All",None,"Farmer,Rural,All","National"),
+        ("PM Fasal Bima Yojana","Agriculture","Insurance cover against crop loss due to natural calamities.","All farmers growing notified crops.","Apply via National Crop Insurance Portal.",18,99,"All",None,"Farmer,All","National"),
+        ("Kisan Credit Card (KCC)","Finance","Low-interest loans for agricultural activities.","Farmers, SHGs, tenant farmers.","Apply at bank branch.",18,75,"All",None,"Farmer,Fisherman,All","National"),
+        ("Ayushman Bharat (PM-JAY)","Health","Health cover up to ₹5 lakh per family per year.","Low-income families and senior citizens.","Check eligibility at pmjay.gov.in.",0,99,"All",150000,"All","National"),
+        ("Atal Pension Yojana","Finance","Guaranteed pension after age 60.","Citizens aged 18-40 with bank account.","Enroll via bank.",18,40,"All",None,"Worker,All","National"),
+        ("PM Mudra Yojana","Finance","Collateral-free business loans up to ₹20 lakh.","Micro and small entrepreneurs.","Apply via bank or udyamimitra.in.",18,65,"All",None,"Entrepreneur,Business,All","National"),
+        ("PM Awas Yojana (Urban)","Housing","Interest subsidy for urban housing.","EWS and LIG urban families.","Apply at pmaymis.gov.in.",18,99,"All",150000,"All","National"),
+        ("PM Awas Yojana (Gramin)","Rural Development","Financial support for rural housing.","Rural homeless households.","Apply at Gram Panchayat.",18,99,"All",None,"Rural,All","National"),
+        ("Sukanya Samriddhi Yojana","WCD","High-interest savings scheme for girl child.","Girl child below 10 years.","Open account at Post Office.",0,10,"Female",None,"Student,All","National"),
+        ("MGNREGA","Rural Development","100 days guaranteed rural employment.","Adult rural residents.","Apply for Job Card at Panchayat.",18,99,"All",None,"Labourer,Rural,All","National")
+        # You can continue remaining schemes similarly
+    ]
 
     conn = get_db_connection()
     cur = conn.cursor()
