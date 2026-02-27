@@ -206,6 +206,44 @@ def test_db():
     except Exception as e:
         return f"Database connection failed: {e}"
     
+@app.route("/create-schemes-table")
+def create_schemes_table():
+    conn = get_db_connection()
+    cur = conn.cursor()
+
+    cur.execute("""
+    CREATE TABLE IF NOT EXISTS schemes (
+        id SERIAL PRIMARY KEY,
+        name VARCHAR(255) NOT NULL,
+        ministry VARCHAR(255),
+        benefits TEXT,
+        eligibility_summary TEXT,
+        how_to_apply TEXT,
+        min_age INTEGER,
+        max_age INTEGER,
+        gender VARCHAR(20) DEFAULT 'All',
+        max_income NUMERIC,
+        occupation_tags TEXT,
+        state_specific VARCHAR(100) DEFAULT 'National'
+    );
+    """)
+
+    conn.commit()
+    cur.close()
+    conn.close()
+
+    return "Schemes table created successfully!" 
+
+@app.route("/check-schemes-table")
+def check_schemes_table():
+    conn = get_db_connection()
+    cur = conn.cursor()
+    cur.execute("SELECT to_regclass('public.schemes');")
+    result = cur.fetchone()[0]
+    cur.close()
+    conn.close()
+
+    return f"Table exists: {result}" 
     
 @app.route("/init-db")
 def init_db():
