@@ -548,9 +548,9 @@ def scheme_advisor():
             income = float(income)
         except:
             income = 0   # IMPORTANT: never use None here
-
+    
         # -------------------
-        # TRY GEMINI (WITH TIMEOUT)
+        # TRY GEMINI (WITH TIMEOUT SAFETY)
         # -------------------
         try:
             import google.generativeai as genai
@@ -560,15 +560,29 @@ def scheme_advisor():
             model = genai.GenerativeModel("gemini-2.5-flash")
 
             prompt = f"""
-            Recommend 3 Indian government schemes.
+            You are an AI Government Scheme Advisor for Indian citizens.
 
-            Age: {age}
-            Gender: {gender}
-            Income: {income}
-            Occupation: {occupation}
-            State: {state}
-            Area Type: {area_type}
-            Need: {need}
+            Based on the user profile below, recommend 3 highly relevant government schemes.
+
+            USER PROFILE:
+            - Age: {age}
+            - Gender: {gender}
+            - Monthly Income: ₹{income}
+            - Occupation: {occupation}
+            - State: {state}
+            - Area Type: {area_type}
+            - Support Needed: {need}
+
+            INSTRUCTIONS:
+            For each scheme clearly provide:
+
+            1. Scheme Name
+            2. Key Benefits (2-3 bullet style sentences)
+            3. Eligibility Criteria
+            4. How to Apply
+
+            Keep the response clean, structured, professional, and easy to read.
+            Do not include unnecessary explanations.
             """
 
             class TimeoutException(Exception):
@@ -578,16 +592,18 @@ def scheme_advisor():
                 raise TimeoutException
 
             signal.signal(signal.SIGALRM, timeout_handler)
-            signal.alarm(5)
+            signal.alarm(5)  # 5 second timeout safety
 
             response = model.generate_content(prompt)
-            signal.alarm(0)
+
+            signal.alarm(0)  # cancel alarm
 
             if response and response.text:
                 return render_template("scheme_result.html", advice=response.text)
 
-        except Exception:
-            signal.alarm(0)
+        except Exception as e:
+            signal.alarm(0)  # ensure alarm always cleared
+            print("Gemini failed, switching to fallback:", e)
 
         # -------------------
         # FALLBACK DATABASE
