@@ -206,7 +206,6 @@ def test_db():
         return f"Database connected successfully! Result: {result}"
     except Exception as e:
         return f"Database connection failed: {e}"
-
     
 @app.route("/init-db")
 def init_db():
@@ -577,13 +576,11 @@ def scheme_advisor():
     return render_template("scheme_form.html")
 
 
+
 @app.route("/logout")
 def logout():
     session.clear()
     return redirect("/login")
-
-
-
 
 if __name__ == "__main__":
     app.run()
