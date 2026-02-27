@@ -7,6 +7,7 @@ import re
 from collections import Counter
 import math
 import random
+import json
 
 STOPWORDS = {
     "the", "is", "in", "and", "to", "of", "for", "on", "with",
@@ -205,7 +206,66 @@ def test_db():
         return f"Database connected successfully! Result: {result}"
     except Exception as e:
         return f"Database connection failed: {e}"
-  
+
+
+@app.route("/seed-schemes-safe")
+def seed_schemes_safe():
+
+    conn = get_db_connection()
+    cur = conn.cursor()
+
+    # Create table safely
+    cur.execute("""
+    CREATE TABLE IF NOT EXISTS schemes (
+        id SERIAL PRIMARY KEY,
+        name VARCHAR(255),
+        ministry VARCHAR(255),
+        benefits TEXT,
+        eligibility_summary TEXT,
+        how_to_apply TEXT,
+        min_age INTEGER,
+        max_age INTEGER,
+        gender VARCHAR(20),
+        max_income NUMERIC,
+        occupation_tags TEXT,
+        state_specific VARCHAR(100)
+    );
+    """)
+
+    # Clear old entries
+    cur.execute("DELETE FROM schemes;")
+
+    # Load JSON
+    with open("schemes_data.json", "r", encoding="utf-8") as f:
+        schemes = json.load(f)
+
+    insert_query = """
+    INSERT INTO schemes
+    (name, ministry, benefits, eligibility_summary, how_to_apply,
+     min_age, max_age, gender, max_income, occupation_tags, state_specific)
+    VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
+    """
+
+    for scheme in schemes:
+        cur.execute(insert_query, (
+            scheme["name"],
+            scheme["ministry"],
+            scheme["benefits"],
+            scheme["eligibility_summary"],
+            scheme["how_to_apply"],
+            scheme["min_age"],
+            scheme["max_age"],
+            scheme["gender"],
+            scheme["max_income"],
+            scheme["occupation_tags"],
+            scheme["state_specific"]
+        ))
+
+    conn.commit()
+    cur.close()
+    conn.close()
+
+    return f"{len(schemes)} schemes inserted successfully!"
     
 @app.route("/init-db")
 def init_db():
