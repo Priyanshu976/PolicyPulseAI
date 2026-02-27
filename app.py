@@ -7,6 +7,7 @@ import re
 from collections import Counter
 import math
 import random
+import signal
 
 
 STOPWORDS = {
@@ -546,53 +547,84 @@ def scheme_advisor():
         try:
             income = float(income)
         except:
-            income = None
+            income = 0   # IMPORTANT: never use None here
 
         # -------------------
-        # TRY GEMINI
-        # -------------------
-        # -------------------
-        # FORCE FALLBACK
+        # TRY GEMINI (WITH TIMEOUT)
         # -------------------
         try:
-            raise Exception("Force fallback")
+            import google.generativeai as genai
+            import signal
+
+            genai.configure(api_key=os.getenv("GOOGLE_API_KEY"))
+            model = genai.GenerativeModel("gemini-2.5-flash")
+
+            prompt = f"""
+            Recommend 3 Indian government schemes.
+
+            Age: {age}
+            Gender: {gender}
+            Income: {income}
+            Occupation: {occupation}
+            State: {state}
+            Area Type: {area_type}
+            Need: {need}
+            """
+
+            class TimeoutException(Exception):
+                pass
+
+            def timeout_handler(signum, frame):
+                raise TimeoutException
+
+            signal.signal(signal.SIGALRM, timeout_handler)
+            signal.alarm(5)
+
+            response = model.generate_content(prompt)
+            signal.alarm(0)
+
+            if response and response.text:
+                return render_template("scheme_result.html", advice=response.text)
+
         except Exception:
-            pass
+            signal.alarm(0)
+
         # -------------------
         # FALLBACK DATABASE
         # -------------------
 
-        conn = get_db_connection()
-        cur = conn.cursor()
+        try:
+            conn = get_db_connection()
+            cur = conn.cursor()
 
-        occ_search = f"%{occupation}%"
+            occ_search = f"%{occupation}%"
 
-        query = """
-        SELECT name, benefits, eligibility_summary, how_to_apply
-        FROM schemes
-        WHERE %s BETWEEN min_age AND max_age
-        AND (gender = %s OR gender = 'All')
-        AND (
-            max_income IS NULL
-            OR (%s IS NOT NULL AND %s <= max_income)
-        )
-        AND (occupation_tags ILIKE %s OR occupation_tags ILIKE '%%All%%')
-        AND (state_specific = %s OR state_specific = 'National')
-        LIMIT 5;
-        """
+            query = """
+            SELECT name, benefits, eligibility_summary, how_to_apply
+            FROM schemes
+            WHERE %s BETWEEN min_age AND max_age
+            AND (gender = %s OR gender = 'All')
+            AND (max_income IS NULL OR %s <= max_income)
+            AND (occupation_tags ILIKE %s OR occupation_tags ILIKE '%%All%%')
+            AND (state_specific = %s OR state_specific = 'National')
+            LIMIT 5;
+            """
 
-        cur.execute(query, (
-            age,
-            gender,
-            income,
-            occ_search,
-            state
-        ))
+            cur.execute(query, (
+                age,
+                gender,
+                income,
+                occ_search,
+                state
+            ))
 
-        results = cur.fetchall()
+            results = cur.fetchall()
 
-        cur.close()
-        conn.close()
+            cur.close()
+            conn.close()
+
+        except Exception as e:
+            return f"Database Error: {str(e)}"
 
         if results:
             formatted = ""
