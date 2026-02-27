@@ -527,8 +527,8 @@ def scheme_advisor():
         return redirect("/login")
 
     if request.method == "POST":
-
-        age = int(request.form.get("age"))
+        # ✅ Extract form data first
+        age = request.form.get("age")
         gender = request.form.get("gender")
         income = request.form.get("income")
         occupation = request.form.get("occupation")
@@ -536,9 +536,6 @@ def scheme_advisor():
         area_type = request.form.get("area_type")
         need = request.form.get("need")
 
-        # -------------------------------
-        # 1️⃣ TRY GEMINI FIRST
-        # -------------------------------
         try:
             import google.generativeai as genai
             genai.configure(api_key=os.getenv("GOOGLE_API_KEY"))
@@ -546,78 +543,36 @@ def scheme_advisor():
             model = genai.GenerativeModel("gemini-2.5-flash")
 
             prompt = f"""
-            Recommend 3 relevant Indian government schemes.
+                You are an AI Government Scheme Advisor for Indian citizens.
 
-            Profile:
-            Age: {age}
-            Gender: {gender}
-            Income: {income}
-            Occupation: {occupation}
-            State: {state}
-            Area Type: {area_type}
-            Need: {need}
+                Based on the following user profile, recommend suitable government schemes.
 
-            Provide:
-            - Scheme Name
-            - Benefits
-            - Eligibility
-            - How to Apply
-            """
+                Profile:
+                Age: {age}
+                Gender: {gender}
+                Monthly Income: {income}
+                Occupation: {occupation}
+                State: {state}
+                Area Type: {area_type}
+                Need: {need}
+
+                Instructions:
+                - Provide 3 to 5 relevant schemes.
+                - For each scheme clearly mention:
+                1. Scheme Name
+                2. Key Benefits
+                3. Eligibility
+                4. How to Apply
+                - Provide clean plain text only.
+                """
 
             response = model.generate_content(prompt)
+            advice = response.text if response and response.text else "No recommendation generated."
 
-            if response and response.text:
-                return render_template("scheme_result.html", advice=response.text)
+            return render_template("scheme_result.html", advice=advice)
 
         except Exception as e:
-            print("Gemini failed:", e)
-
-        # -------------------------------
-        # 2️⃣ DATABASE FALLBACK
-        # -------------------------------
-
-        conn = get_db_connection()
-        cur = conn.cursor()
-
-        query = """
-        SELECT name, benefits, eligibility_summary, how_to_apply
-        FROM schemes
-        WHERE %s BETWEEN min_age AND max_age
-        AND (gender = %s OR gender = 'All')
-        AND (max_income IS NULL OR %s <= max_income)
-        AND (occupation_tags ILIKE %s OR occupation_tags ILIKE '%%All%%')
-        AND (state_specific = %s OR state_specific = 'National')
-        LIMIT 5;
-        """
-
-        occ_search = f"%{occupation}%"
-
-        cur.execute(query, (
-            age,
-            gender,
-            float(income) if income else None,
-            occ_search,
-            state
-        ))
-
-        results = cur.fetchall()
-
-        cur.close()
-        conn.close()
-
-        if results:
-            formatted = ""
-            for row in results:
-                formatted += f"""
-                <h4>{row[0]}</h4>
-                <b>Benefits:</b> {row[1]}<br>
-                <b>Eligibility:</b> {row[2]}<br>
-                <b>How to Apply:</b> {row[3]}<br><br>
-                """
-        else:
-            formatted = "No matching schemes found."
-
-        return render_template("scheme_result.html", advice=formatted)
+            return f"Error: {e}"
 
     return render_template("scheme_form.html")
 
