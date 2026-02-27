@@ -207,45 +207,6 @@ def test_db():
     except Exception as e:
         return f"Database connection failed: {e}"
     
-@app.route("/check-schemes-table")
-def check_schemes_table():
-    try:
-        conn = get_db_connection()
-        cur = conn.cursor()
-
-        cur.execute("""
-            SELECT EXISTS (
-                SELECT FROM information_schema.tables 
-                WHERE table_name = 'schemes'
-            );
-        """)
-
-        exists = cur.fetchone()[0]
-
-        cur.close()
-        conn.close()
-
-        return f"Table exists: {exists}"
-
-    except Exception as e:
-        return f"Error: {str(e)}"
-    
-@app.route("/check-schemes-count")
-def check_schemes_count():
-    try:
-        conn = get_db_connection()
-        cur = conn.cursor()
-
-        cur.execute("SELECT COUNT(*) FROM schemes;")
-        count = cur.fetchone()[0]
-
-        cur.close()
-        conn.close()
-
-        return f"Total schemes: {count}"
-
-    except Exception as e:
-        return f"Error: {str(e)}"
     
 @app.route("/init-db")
 def init_db():
@@ -562,11 +523,12 @@ def admin_panel():
 
 @app.route("/scheme-advisor", methods=["GET", "POST"])
 def scheme_advisor():
+
     if "user_id" not in session:
         return redirect("/login")
 
     if request.method == "POST":
-        # ✅ Extract form data first
+
         age = request.form.get("age")
         gender = request.form.get("gender")
         income = request.form.get("income")
@@ -575,46 +537,96 @@ def scheme_advisor():
         area_type = request.form.get("area_type")
         need = request.form.get("need")
 
+        # SAFE CONVERSIONS
+        try:
+            age = int(age)
+        except:
+            age = 0
+
+        try:
+            income = float(income)
+        except:
+            income = None
+
+        # -------------------
+        # TRY GEMINI
+        # -------------------
         try:
             import google.generativeai as genai
             genai.configure(api_key=os.getenv("GOOGLE_API_KEY"))
-
             model = genai.GenerativeModel("gemini-2.5-flash")
 
             prompt = f"""
-                You are an AI Government Scheme Advisor for Indian citizens.
+            Recommend 3 Indian government schemes.
 
-                Based on the following user profile, recommend suitable government schemes.
-
-                Profile:
-                Age: {age}
-                Gender: {gender}
-                Monthly Income: {income}
-                Occupation: {occupation}
-                State: {state}
-                Area Type: {area_type}
-                Need: {need}
-
-                Instructions:
-                - Provide 3 to 5 relevant schemes.
-                - For each scheme clearly mention:
-                1. Scheme Name
-                2. Key Benefits
-                3. Eligibility
-                4. How to Apply
-                - Provide clean plain text only.
-                """
+            Age: {age}
+            Gender: {gender}
+            Income: {income}
+            Occupation: {occupation}
+            State: {state}
+            Area Type: {area_type}
+            Need: {need}
+            """
 
             response = model.generate_content(prompt)
-            advice = response.text if response and response.text else "No recommendation generated."
 
-            return render_template("scheme_result.html", advice=advice)
+            if response and response.text:
+                return render_template("scheme_result.html", advice=response.text)
 
         except Exception as e:
-            return f"Error: {e}"
+            print("Gemini failed:", e)
+
+        # -------------------
+        # FALLBACK DATABASE
+        # -------------------
+
+        conn = get_db_connection()
+        cur = conn.cursor()
+
+        occ_search = f"%{occupation}%"
+
+        query = """
+        SELECT name, benefits, eligibility_summary, how_to_apply
+        FROM schemes
+        WHERE %s BETWEEN min_age AND max_age
+        AND (gender = %s OR gender = 'All')
+        AND (
+            max_income IS NULL
+            OR (%s IS NOT NULL AND %s <= max_income)
+        )
+        AND (occupation_tags ILIKE %s OR occupation_tags ILIKE '%%All%%')
+        AND (state_specific = %s OR state_specific = 'National')
+        LIMIT 5;
+        """
+
+        cur.execute(query, (
+            age,
+            gender,
+            income,
+            occ_search,
+            state
+        ))
+
+        results = cur.fetchall()
+
+        cur.close()
+        conn.close()
+
+        if results:
+            formatted = ""
+            for row in results:
+                formatted += f"""
+                <h4>{row[0]}</h4>
+                <b>Benefits:</b> {row[1]}<br>
+                <b>Eligibility:</b> {row[2]}<br>
+                <b>How to Apply:</b> {row[3]}<br><br>
+                """
+        else:
+            formatted = "No matching schemes found."
+
+        return render_template("scheme_result.html", advice=formatted)
 
     return render_template("scheme_form.html")
-
 
 
 @app.route("/logout")
