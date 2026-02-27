@@ -551,31 +551,13 @@ def scheme_advisor():
         # -------------------
         # TRY GEMINI
         # -------------------
+        # -------------------
+        # FORCE FALLBACK
+        # -------------------
         try:
-            import google.generativeai as genai
-            genai.configure(api_key=os.getenv("GOOGLE_API_KEY"))
-            model = genai.GenerativeModel("gemini-2.5-flash")
-
-            prompt = f"""
-            Recommend 3 Indian government schemes.
-
-            Age: {age}
-            Gender: {gender}
-            Income: {income}
-            Occupation: {occupation}
-            State: {state}
-            Area Type: {area_type}
-            Need: {need}
-            """
-
-            response = model.generate_content(prompt)
-
-            if response and response.text:
-                return render_template("scheme_result.html", advice=response.text)
-
-        except Exception as e:
-            print("Gemini failed:", e)
-
+            raise Exception("Force fallback")
+        except Exception:
+            pass
         # -------------------
         # FALLBACK DATABASE
         # -------------------
