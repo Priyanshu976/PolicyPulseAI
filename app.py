@@ -592,7 +592,7 @@ def scheme_advisor():
                 raise TimeoutException
 
             signal.signal(signal.SIGALRM, timeout_handler)
-            signal.alarm(5)  # 5 second timeout safety
+            signal.alarm(30)  # 5 second timeout safety
 
             response = model.generate_content(prompt)
 
