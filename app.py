@@ -234,6 +234,73 @@ def create_schemes_table():
 
     return "Schemes table created successfully!" 
 
+@app.route("/seed-schemes")
+def seed_schemes():
+
+    schemes_data = [
+        (
+            "PM-Kisan Samman Nidhi",
+            "Agriculture",
+            "Provides ₹6,000 annually to eligible farmers in three DBT installments.",
+            "Small and marginal farmers owning cultivable land.",
+            "Register at pmkisan.gov.in with Aadhaar and land details.",
+            18, 99, "All", None, "Farmer,Rural,All", "National"
+        ),
+        (
+            "Ayushman Bharat (PM-JAY)",
+            "Health",
+            "Health insurance coverage up to ₹5 lakh per family annually.",
+            "Eligible low-income families and senior citizens.",
+            "Check eligibility at mera.pmjay.gov.in.",
+            0, 99, "All", 150000, "All", "National"
+        ),
+        (
+            "PM Mudra Yojana",
+            "Finance",
+            "Collateral-free loans up to ₹20 lakh for micro enterprises.",
+            "Entrepreneurs and small business owners.",
+            "Apply through udyamimitra.in or bank branch.",
+            18, 65, "All", None, "Entrepreneur,Business,All", "National"
+        ),
+        (
+            "MGNREGA",
+            "Rural Development",
+            "Guarantees 100 days of wage employment annually.",
+            "Adult rural residents willing to perform manual work.",
+            "Apply at Gram Panchayat for Job Card.",
+            18, 99, "All", None, "Labourer,Rural,All", "National"
+        )
+    ]
+
+    conn = get_db_connection()
+    cur = conn.cursor()
+
+    insert_query = """
+    INSERT INTO schemes
+    (name, ministry, benefits, eligibility_summary, how_to_apply,
+     min_age, max_age, gender, max_income, occupation_tags, state_specific)
+    VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
+    """
+
+    for scheme in schemes_data:
+        cur.execute(insert_query, scheme)
+
+    conn.commit()
+    cur.close()
+    conn.close()
+
+    return "Schemes inserted successfully!"
+
+@app.route("/count-schemes")
+def count_schemes():
+    conn = get_db_connection()
+    cur = conn.cursor()
+    cur.execute("SELECT COUNT(*) FROM schemes;")
+    count = cur.fetchone()[0]
+    cur.close()
+    conn.close()
+    return f"Total schemes: {count}"
+
 @app.route("/check-schemes-table")
 def check_schemes_table():
     conn = get_db_connection()
