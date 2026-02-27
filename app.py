@@ -7,7 +7,7 @@ import re
 from collections import Counter
 import math
 import random
-import json
+
 
 STOPWORDS = {
     "the", "is", "in", "and", "to", "of", "for", "on", "with",
