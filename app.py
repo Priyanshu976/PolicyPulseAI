@@ -207,6 +207,46 @@ def test_db():
     except Exception as e:
         return f"Database connection failed: {e}"
     
+@app.route("/check-schemes-table")
+def check_schemes_table():
+    try:
+        conn = get_db_connection()
+        cur = conn.cursor()
+
+        cur.execute("""
+            SELECT EXISTS (
+                SELECT FROM information_schema.tables 
+                WHERE table_name = 'schemes'
+            );
+        """)
+
+        exists = cur.fetchone()[0]
+
+        cur.close()
+        conn.close()
+
+        return f"Table exists: {exists}"
+
+    except Exception as e:
+        return f"Error: {str(e)}"
+    
+@app.route("/check-schemes-count")
+def check_schemes_count():
+    try:
+        conn = get_db_connection()
+        cur = conn.cursor()
+
+        cur.execute("SELECT COUNT(*) FROM schemes;")
+        count = cur.fetchone()[0]
+
+        cur.close()
+        conn.close()
+
+        return f"Total schemes: {count}"
+
+    except Exception as e:
+        return f"Error: {str(e)}"
+    
 @app.route("/init-db")
 def init_db():
     try:
