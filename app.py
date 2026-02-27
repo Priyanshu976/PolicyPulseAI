@@ -234,27 +234,46 @@ def create_schemes_table():
 
     return "Schemes table created successfully!" 
 
-@app.route("/seed-schemes-full")
-def seed_schemes_full():
+@app.route("/seed-schemes")
+def seed_schemes():
 
     schemes_data = [
-        ("PM-Kisan Samman Nidhi","Agriculture","₹6,000 annual income support to farmers via DBT.","Small and marginal farmers with cultivable land.","Apply at pmkisan.gov.in.",18,99,"All",None,"Farmer,Rural,All","National"),
-        ("PM Fasal Bima Yojana","Agriculture","Insurance cover against crop loss due to natural calamities.","All farmers growing notified crops.","Apply via National Crop Insurance Portal.",18,99,"All",None,"Farmer,All","National"),
-        ("Kisan Credit Card (KCC)","Finance","Low-interest loans for agricultural activities.","Farmers, SHGs, tenant farmers.","Apply at bank branch.",18,75,"All",None,"Farmer,Fisherman,All","National"),
-        ("Ayushman Bharat (PM-JAY)","Health","Health cover up to ₹5 lakh per family per year.","Low-income families and senior citizens.","Check eligibility at pmjay.gov.in.",0,99,"All",150000,"All","National"),
-        ("Atal Pension Yojana","Finance","Guaranteed pension after age 60.","Citizens aged 18-40 with bank account.","Enroll via bank.",18,40,"All",None,"Worker,All","National"),
-        ("PM Mudra Yojana","Finance","Collateral-free business loans up to ₹20 lakh.","Micro and small entrepreneurs.","Apply via bank or udyamimitra.in.",18,65,"All",None,"Entrepreneur,Business,All","National"),
-        ("PM Awas Yojana (Urban)","Housing","Interest subsidy for urban housing.","EWS and LIG urban families.","Apply at pmaymis.gov.in.",18,99,"All",150000,"All","National"),
-        ("PM Awas Yojana (Gramin)","Rural Development","Financial support for rural housing.","Rural homeless households.","Apply at Gram Panchayat.",18,99,"All",None,"Rural,All","National"),
-        ("Sukanya Samriddhi Yojana","WCD","High-interest savings scheme for girl child.","Girl child below 10 years.","Open account at Post Office.",0,10,"Female",None,"Student,All","National"),
-        ("MGNREGA","Rural Development","100 days guaranteed rural employment.","Adult rural residents.","Apply for Job Card at Panchayat.",18,99,"All",None,"Labourer,Rural,All","National")
-        # You can continue remaining schemes similarly
+        (
+            "PM-Kisan Samman Nidhi",
+            "Agriculture",
+            "Provides ₹6,000 annually to eligible farmers in three DBT installments.",
+            "Small and marginal farmers owning cultivable land.",
+            "Register at pmkisan.gov.in with Aadhaar and land details.",
+            18, 99, "All", None, "Farmer,Rural,All", "National"
+        ),
+        (
+            "Ayushman Bharat (PM-JAY)",
+            "Health",
+            "Health insurance coverage up to ₹5 lakh per family annually.",
+            "Eligible low-income families and senior citizens.",
+            "Check eligibility at mera.pmjay.gov.in.",
+            0, 99, "All", 150000, "All", "National"
+        ),
+        (
+            "PM Mudra Yojana",
+            "Finance",
+            "Collateral-free loans up to ₹20 lakh for micro enterprises.",
+            "Entrepreneurs and small business owners.",
+            "Apply through udyamimitra.in or bank branch.",
+            18, 65, "All", None, "Entrepreneur,Business,All", "National"
+        ),
+        (
+            "MGNREGA",
+            "Rural Development",
+            "Guarantees 100 days of wage employment annually.",
+            "Adult rural residents willing to perform manual work.",
+            "Apply at Gram Panchayat for Job Card.",
+            18, 99, "All", None, "Labourer,Rural,All", "National"
+        )
     ]
 
     conn = get_db_connection()
     cur = conn.cursor()
-
-    cur.execute("DELETE FROM schemes;")
 
     insert_query = """
     INSERT INTO schemes
@@ -263,23 +282,16 @@ def seed_schemes_full():
     VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
     """
 
-    cur.executemany(insert_query, schemes_data)
+    for scheme in schemes_data:
+        cur.execute(insert_query, scheme)
 
     conn.commit()
     cur.close()
     conn.close()
 
-    return f"{len(schemes_data)} schemes inserted successfully!"
+    return "Schemes inserted successfully!"
 
-@app.route("/count-schemes")
-def count_schemes():
-    conn = get_db_connection()
-    cur = conn.cursor()
-    cur.execute("SELECT COUNT(*) FROM schemes;")
-    count = cur.fetchone()[0]
-    cur.close()
-    conn.close()
-    return f"Total schemes: {count}"
+
 
 @app.route("/check-schemes-table")
 def check_schemes_table():
