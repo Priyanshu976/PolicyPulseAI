@@ -207,16 +207,6 @@ def test_db():
     except Exception as e:
         return f"Database connection failed: {e}"
 
-
-@app.route("/debug-schemes")
-def debug_schemes():
-    conn = get_db_connection()
-    cur = conn.cursor()
-    cur.execute("SELECT name FROM schemes LIMIT 5;")
-    rows = cur.fetchall()
-    cur.close()
-    conn.close()
-    return str(rows)
     
 @app.route("/init-db")
 def init_db():
