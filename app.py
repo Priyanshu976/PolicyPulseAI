@@ -7,6 +7,9 @@ import re
 from collections import Counter
 import math
 import random
+import signal
+import time
+import google.generativeai as genai
 
 STOPWORDS = {
     "the", "is", "in", "and", "to", "of", "for", "on", "with",
@@ -547,54 +550,80 @@ def scheme_advisor():
         except:
             income = 0
 
+        prompt = f"""
+You are an AI Government Scheme Advisor for Indian citizens.
+
+Based on the user profile below, recommend 3 highly relevant government schemes.
+
+USER PROFILE:
+- Age: {age}
+- Gender: {gender}
+- Monthly Income: ₹{income}
+- Occupation: {occupation}
+- State: {state}
+- Area Type: {area_type}
+- Support Needed: {need}
+
+Only recommend real Indian government schemes such as:
+PMAY, PM Mudra Yojana, Ayushman Bharat, PM Kisan, Skill India,
+Stand Up India, Digital India, Sukanya Samriddhi Yojana, etc.
+
+For each scheme clearly provide:
+
+1. Scheme Name
+2. Key Benefits (2-3 bullet style sentences)
+3. Eligibility Criteria
+4. How to Apply
+
+Keep the response clean, structured, professional, and easy to read.
+"""
+
         try:
-            import google.generativeai as genai
-
             genai.configure(api_key=os.getenv("GOOGLE_API_KEY"))
-
             model = genai.GenerativeModel("gemini-1.5-flash")
 
-            prompt = f"""
-                You are an AI Government Scheme Advisor for Indian citizens.
+            # -------- TIMEOUT HANDLER --------
+            class TimeoutException(Exception):
+                pass
 
-                Based on the user profile below, recommend 3 highly relevant government schemes.
+            def timeout_handler(signum, frame):
+                raise TimeoutException("Gemini request timed out")
 
-                USER PROFILE:
-                - Age: {age}
-                - Gender: {gender}
-                - Monthly Income: ₹{income}
-                - Occupation: {occupation}
-                - State: {state}
-                - Area Type: {area_type}
-                - Support Needed: {need}
+            signal.signal(signal.SIGALRM, timeout_handler)
 
-                INSTRUCTIONS:
-                For each scheme clearly provide:
+            max_retries = 3
+            retry_delay = 2
 
-                1. Scheme Name
-                2. Key Benefits (2-3 bullet style sentences)
-                3. Eligibility Criteria
-                4. How to Apply
+            for attempt in range(max_retries):
 
-                Keep the response clean, structured, professional, and easy to read.
-                Do not include unnecessary explanations.
-                """
+                try:
+                    signal.alarm(30)  # wait up to 30 seconds
 
-            response = model.generate_content(prompt)
+                    response = model.generate_content(prompt)
 
-            if response and response.text:
-                return render_template(
-                    "scheme_result.html",
-                    advice=response.text
-                )
+                    signal.alarm(0)
+
+                    if response and response.text:
+                        return render_template(
+                            "scheme_result.html",
+                            advice=response.text
+                        )
+
+                except TimeoutException:
+                    print("Gemini timeout... retrying")
+
+                except Exception as e:
+                    print("Gemini error:", e)
+
+                time.sleep(retry_delay)
 
             return render_template(
                 "scheme_result.html",
-                advice="No scheme recommendations generated. Please try again."
+                advice="AI advisor is busy right now. Please try again in a few seconds."
             )
 
         except Exception as e:
-            print("Gemini Error:", e)
+            print("Gemini initialization error:", e)
 
             return render_template(
                 "scheme_result.html",
