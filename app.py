@@ -7,8 +7,6 @@ import re
 from collections import Counter
 import math
 import random
-import signal
-
 
 STOPWORDS = {
     "the", "is", "in", "and", "to", "of", "for", "on", "with",
@@ -547,114 +545,61 @@ def scheme_advisor():
         try:
             income = float(income)
         except:
-            income = 0   # IMPORTANT: never use None here
-    
-        # -------------------
-        # TRY GEMINI (WITH TIMEOUT SAFETY)
-        # -------------------
+            income = 0
+
         try:
             import google.generativeai as genai
-            import signal
 
             genai.configure(api_key=os.getenv("GOOGLE_API_KEY"))
-            model = genai.GenerativeModel("gemini-2.5-flash")
+
+            model = genai.GenerativeModel("gemini-1.5-flash")
 
             prompt = f"""
-            You are an AI Government Scheme Advisor for Indian citizens.
+                You are an AI Government Scheme Advisor for Indian citizens.
 
-            Based on the user profile below, recommend 3 highly relevant government schemes.
+                Based on the user profile below, recommend 3 highly relevant government schemes.
 
-            USER PROFILE:
-            - Age: {age}
-            - Gender: {gender}
-            - Monthly Income: ₹{income}
-            - Occupation: {occupation}
-            - State: {state}
-            - Area Type: {area_type}
-            - Support Needed: {need}
+                USER PROFILE:
+                - Age: {age}
+                - Gender: {gender}
+                - Monthly Income: ₹{income}
+                - Occupation: {occupation}
+                - State: {state}
+                - Area Type: {area_type}
+                - Support Needed: {need}
 
-            INSTRUCTIONS:
-            For each scheme clearly provide:
+                INSTRUCTIONS:
+                For each scheme clearly provide:
 
-            1. Scheme Name
-            2. Key Benefits (2-3 bullet style sentences)
-            3. Eligibility Criteria
-            4. How to Apply
+                1. Scheme Name
+                2. Key Benefits (2-3 bullet style sentences)
+                3. Eligibility Criteria
+                4. How to Apply
 
-            Keep the response clean, structured, professional, and easy to read.
-            Do not include unnecessary explanations.
-            """
-
-            class TimeoutException(Exception):
-                pass
-
-            def timeout_handler(signum, frame):
-                raise TimeoutException
-
-            signal.signal(signal.SIGALRM, timeout_handler)
-            signal.alarm(30)  # 5 second timeout safety
+                Keep the response clean, structured, professional, and easy to read.
+                Do not include unnecessary explanations.
+                """
 
             response = model.generate_content(prompt)
 
-            signal.alarm(0)  # cancel alarm
-
             if response and response.text:
-                return render_template("scheme_result.html", advice=response.text)
+                return render_template(
+                    "scheme_result.html",
+                    advice=response.text
+                )
+
+            return render_template(
+                "scheme_result.html",
+                advice="No scheme recommendations generated. Please try again."
+            )
 
         except Exception as e:
-            signal.alarm(0)  # ensure alarm always cleared
-            print("Gemini failed, switching to fallback:", e)
+            print("Gemini Error:", e)
 
-        # -------------------
-        # FALLBACK DATABASE
-        # -------------------
-
-        try:
-            conn = get_db_connection()
-            cur = conn.cursor()
-
-            occ_search = f"%{occupation}%"
-
-            query = """
-            SELECT name, benefits, eligibility_summary, how_to_apply
-            FROM schemes
-            WHERE %s BETWEEN min_age AND max_age
-            AND (gender = %s OR gender = 'All')
-            AND (max_income IS NULL OR %s <= max_income)
-            AND (occupation_tags ILIKE %s OR occupation_tags ILIKE '%%All%%')
-            AND (state_specific = %s OR state_specific = 'National')
-            LIMIT 5;
-            """
-
-            cur.execute(query, (
-                age,
-                gender,
-                income,
-                occ_search,
-                state
-            ))
-
-            results = cur.fetchall()
-
-            cur.close()
-            conn.close()
-
-        except Exception as e:
-            return f"Database Error: {str(e)}"
-
-        if results:
-            formatted = ""
-            for row in results:
-                formatted += f"""
-                <h4>{row[0]}</h4>
-                <b>Benefits:</b> {row[1]}<br>
-                <b>Eligibility:</b> {row[2]}<br>
-                <b>How to Apply:</b> {row[3]}<br><br>
-                """
-        else:
-            formatted = "No matching schemes found."
-
-        return render_template("scheme_result.html", advice=formatted)
+            return render_template(
+                "scheme_result.html",
+                advice="AI advisor is temporarily unavailable. Please try again later."
+            )
 
     return render_template("scheme_form.html")
 
