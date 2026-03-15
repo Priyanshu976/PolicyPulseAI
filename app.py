@@ -564,10 +564,6 @@ USER PROFILE:
 - Area Type: {area_type}
 - Support Needed: {need}
 
-Only recommend real Indian government schemes such as:
-PMAY, PM Mudra Yojana, Ayushman Bharat, PM Kisan, Skill India,
-Stand Up India, Digital India, Sukanya Samriddhi Yojana, etc.
-
 For each scheme clearly provide:
 
 1. Scheme Name
@@ -580,7 +576,7 @@ Keep the response clean, structured, professional, and easy to read.
 
         try:
             genai.configure(api_key=os.getenv("GOOGLE_API_KEY"))
-            model = genai.GenerativeModel("gemini-1.5-flash")
+            model = genai.GenerativeModel("gemini-2.5-flash")
 
             # -------- TIMEOUT HANDLER --------
             class TimeoutException(Exception):
